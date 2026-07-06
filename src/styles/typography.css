@@ -1,0 +1,7 @@
+@import '@fontsource-variable/inter/standard.css';
+
+@layer base {
+  body {
+    font-family: 'Inter Variable', sans-serif;
+  }
+}

@@ -12,9 +12,9 @@ vi.mock('node:fs', () => {
   return { default: { readFileSync }, readFileSync }
 })
 
-describe('uniqueMark plugin', async () => {
-  const { uniqueMark } = await import('./unique-mark')
+const { uniqueMark } = await import('./unique-mark')
 
+describe('uniqueMark plugin', () => {
   it('creates a Vite plugin with correct name', () => {
     const plugin = uniqueMark()
     expect(plugin.name).toBe('vite-plugin-unique-mark')

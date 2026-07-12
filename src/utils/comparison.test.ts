@@ -294,6 +294,46 @@ describe('comparison.utils', () => {
       expect(result.allImages.find(img => img.id === 0)?.eliminated).toBe(true)
       expect(result.winner?.id).toBe(1)
     })
+
+    it('selectWinner E should return state unchanged when there is no current match', () => {
+      const state: ContestState = {
+        activeImages: [],
+        allImages: [{ eliminated: false, filename: 'img1.jpg', id: 0, url: 'url1' }],
+        currentMatch: undefined,
+        isComplete: false,
+        matchesCompletedInRound: 0,
+        matchesInRound: 0,
+        round: 1,
+        winner: undefined,
+      }
+      const result = selectWinner(state, 0)
+      expect(result).toBe(state)
+    })
+
+    it('selectWinner F should return state unchanged when winnerId matches neither image in the current match', () => {
+      const state: ContestState = {
+        activeImages: [
+          { eliminated: false, filename: 'img1.jpg', id: 0, url: 'url1' },
+          { eliminated: false, filename: 'img2.jpg', id: 1, url: 'url2' },
+        ],
+        allImages: [
+          { eliminated: false, filename: 'img1.jpg', id: 0, url: 'url1' },
+          { eliminated: false, filename: 'img2.jpg', id: 1, url: 'url2' },
+        ],
+        currentMatch: {
+          leftImage: { eliminated: false, filename: 'img1.jpg', id: 0, url: 'url1' },
+          matchNumber: 1,
+          rightImage: { eliminated: false, filename: 'img2.jpg', id: 1, url: 'url2' },
+        },
+        isComplete: false,
+        matchesCompletedInRound: 0,
+        matchesInRound: 1,
+        round: 1,
+        winner: undefined,
+      }
+      const result = selectWinner(state, 99)
+      expect(result).toBe(state)
+    })
   })
 
   describe(startContest, () => {

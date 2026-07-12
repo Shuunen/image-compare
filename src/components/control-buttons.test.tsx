@@ -84,22 +84,18 @@ describe('control-buttons', () => {
 
   it('ControlButtons G should trigger file input when left upload button is clicked', () => {
     const { container } = render(<ControlButtons contestState={undefined} onLeftImageUpload={mockLeftUpload} onReset={mockReset} onRightImageUpload={mockRightUpload} />)
-    const leftButton = screen.getAllByRole('button').find(btn => btn.textContent?.includes('Left Image'))
-    if (leftButton) {
-      fireEvent.click(leftButton)
-      const fileInput = container.querySelector('#left-upload')
-      expect(fileInput).toBeInstanceOf(HTMLElement)
-    }
+    const leftButton = screen.getByText('Change left image')
+    fireEvent.click(leftButton)
+    const fileInput = container.querySelector('#left-upload')
+    expect(fileInput).toBeInstanceOf(HTMLElement)
   })
 
   it('ControlButtons H should trigger file input when right upload button is clicked', () => {
     const { container } = render(<ControlButtons contestState={undefined} onLeftImageUpload={mockLeftUpload} onReset={mockReset} onRightImageUpload={mockRightUpload} />)
-    const rightButton = screen.getAllByRole('button').find(btn => btn.textContent?.includes('Right Image'))
-    if (rightButton) {
-      fireEvent.click(rightButton)
-      const fileInput = container.querySelector('#right-upload')
-      expect(fileInput).toBeInstanceOf(HTMLElement)
-    }
+    const rightButton = screen.getByText('Change right image')
+    fireEvent.click(rightButton)
+    const fileInput = container.querySelector('#right-upload')
+    expect(fileInput).toBeInstanceOf(HTMLElement)
   })
 
   it('ControlButtons I should call onLeftImageUpload when left file input changes', () => {

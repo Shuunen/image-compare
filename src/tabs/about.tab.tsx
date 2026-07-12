@@ -25,8 +25,8 @@ const imageAnimation = {
   show: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] } },
 } satisfies Variants
 
-function Num({ children: number }: { children: string }) {
-  return <span className="mx-1 inline-flex size-5 justify-center rounded-full bg-blue-900 font-mono leading-5 shadow-md shadow-accent-foreground/30">{number}</span>
+function Num({ children }: { children: number }) {
+  return <span className="mx-1 inline-flex size-5 justify-center rounded-full bg-blue-900 font-mono leading-5 shadow-md shadow-accent-foreground/30">{children}</span>
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -50,28 +50,28 @@ export function About() {
         </motion.div>
         <motion.div variants={textAnimation}>
           <Paragraph>
-            You are on menu <Num>1</Num> on the screenshot below :
+            You are on menu <Num>{1}</Num> on the screenshot below :
           </Paragraph>
         </motion.div>
         <motion.img alt="demo" className="shadow-xl shadow-muted-foreground/20" src="/demo.jpg" variants={imageAnimation} />
         <motion.div variants={textAnimation}>
           <Paragraph>
-            Go to menu <Num>2</Num> to see the comparison in action or menu <Num>3</Num> to adjust comparison settings.
+            Go to menu <Num>{2}</Num> to see the comparison in action or menu <Num>{3}</Num> to adjust comparison settings.
           </Paragraph>
         </motion.div>
         <motion.div variants={textAnimation}>
           <Paragraph>
-            You can upload your own images <Num>4</Num> & <Num>5</Num> by clicking the &ldquo;Left Image&rdquo; <Num>9</Num> and &ldquo;Right Image&rdquo; <Num>11</Num> buttons.
+            You can upload your own images <Num>{4}</Num> & <Num>{5}</Num> by clicking the &ldquo;Left Image&rdquo; <Num>{9}</Num> and &ldquo;Right Image&rdquo; <Num>{11}</Num> buttons.
           </Paragraph>
         </motion.div>
         <motion.div variants={textAnimation}>
           <Paragraph>
-            Use the slider <Num>6</Num> or <Num>7</Num> to adjust the comparison position. You can zoom in and out using your mouse wheel and pan around by clicking and dragging the images <Num>4</Num> & <Num>5</Num>.
+            Use the slider <Num>{6}</Num> or <Num>{7}</Num> to adjust the comparison position. You can zoom in and out using your mouse wheel and pan around by clicking and dragging the images <Num>{4}</Num> & <Num>{5}</Num>.
           </Paragraph>
         </motion.div>
         <motion.div variants={textAnimation}>
           <Paragraph>
-            The zoom level is displayed at the bottom right corner <Num>8</Num>. You can reset the zoom and pan by clicking the &ldquo;Reset View&rdquo; button <Num>10</Num>.
+            The zoom level is displayed at the bottom right corner <Num>{8}</Num>. You can reset the zoom and pan by clicking the &ldquo;Reset View&rdquo; button <Num>{10}</Num>.
           </Paragraph>
         </motion.div>
         <motion.div variants={textAnimation}>

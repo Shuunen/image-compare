@@ -40,6 +40,9 @@ export function readImageFile(file: File, onSuccess: (dataUrl: string) => void, 
     if (typeof result === 'string') onSuccess(result)
     else onError('Result is not a string.')
   }
+  /* v8 ignore next 3 -- @preserve */
+  // oxlint-disable-next-line prefer-add-event-listener
+  reader.onerror = () => onError(reader.error?.message ?? 'Failed to read file.')
   reader.readAsDataURL(file)
 }
 

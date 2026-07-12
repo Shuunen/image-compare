@@ -41,12 +41,10 @@ describe('image-viewer', () => {
     expect(zoomText).toBeInstanceOf(HTMLElement)
   })
 
-  it('ImageViewer C should have choose buttons with zero opacity when not in contest mode', () => {
+  it('ImageViewer C should not render choose buttons when not in contest mode', () => {
     render(<ImageViewer {...mockProps} />)
-    const leftButton = screen.getByText('Choose left image')
-    const rightButton = screen.getByText('Choose right image')
-    expect(leftButton).toBeInstanceOf(HTMLElement)
-    expect(rightButton).toBeInstanceOf(HTMLElement)
+    expect(screen.queryByText('Choose left image')).toBeNull()
+    expect(screen.queryByText('Choose right image')).toBeNull()
   })
 
   it('ImageViewer D should display choose buttons in contest mode', () => {

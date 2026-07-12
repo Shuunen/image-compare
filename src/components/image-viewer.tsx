@@ -170,16 +170,20 @@ export function ImageViewer({
         Zoom: {Math.round(zoom * 100)}%
       </motion.div>
       {/* v8 ignore start -- @preserve */}
-      <motion.div animate={{ opacity: isContestMode ? 1 : 0, y: isContestMode ? 0 : 20 }} className={cn('absolute bottom-2 left-2', isDraggingOver && 'pointer-events-none')} initial={{ opacity: 0, y: 20 }} transition={{ duration: 0.3 }}>
-        <Button name="choose-left" onClick={() => onSelectWinner(contestState?.currentMatch?.leftImage.id ?? 0)} variant="secondary">
-          Choose left image
-        </Button>
-      </motion.div>
-      <motion.div animate={{ opacity: isContestMode ? 1 : 0, y: isContestMode ? 0 : 20 }} className={cn('absolute right-2 bottom-2', isDraggingOver && 'pointer-events-none')} initial={{ opacity: 0, y: 20 }} transition={{ duration: 0.3 }}>
-        <Button name="choose-right" onClick={() => onSelectWinner(contestState?.currentMatch?.rightImage.id ?? 0)} variant="secondary">
-          Choose right image
-        </Button>
-      </motion.div>
+      {isContestMode && (
+        <>
+          <motion.div animate={{ opacity: 1, y: 0 }} className={cn('absolute bottom-2 left-2', isDraggingOver && 'pointer-events-none')} initial={{ opacity: 0, y: 20 }} transition={{ duration: 0.3 }}>
+            <Button name="choose-left" onClick={() => onSelectWinner(contestState?.currentMatch?.leftImage.id ?? 0)} variant="secondary">
+              Choose left image
+            </Button>
+          </motion.div>
+          <motion.div animate={{ opacity: 1, y: 0 }} className={cn('absolute right-2 bottom-2', isDraggingOver && 'pointer-events-none')} initial={{ opacity: 0, y: 20 }} transition={{ duration: 0.3 }}>
+            <Button name="choose-right" onClick={() => onSelectWinner(contestState?.currentMatch?.rightImage.id ?? 0)} variant="secondary">
+              Choose right image
+            </Button>
+          </motion.div>
+        </>
+      )}
       {/* v8 ignore stop -- @preserve */}
     </motion.div>
   )

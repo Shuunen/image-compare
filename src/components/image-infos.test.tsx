@@ -3,10 +3,8 @@ import { ImageInfos } from './image-infos'
 
 describe('image-infos', () => {
   it('ImageInfos A empty infos means no paragraphs are rendered', () => {
-    render(<ImageInfos infos={[]} />)
-    console.log(screen.debug())
-    const paragraph = screen.queryByRole('paragraph', { hidden: true })
-    expect(paragraph).toBeNull()
+    const { container } = render(<ImageInfos infos={[]} />)
+    expect(container.querySelectorAll('p')).toHaveLength(0)
   })
 
   it('ImageInfos B should render left column infos for provided metadata', () => {

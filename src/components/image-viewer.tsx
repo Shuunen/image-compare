@@ -39,6 +39,7 @@ function DragOverlay({ isDraggingLeft, isDraggingOver, nbDraggedFiles }: { isDra
         nbDraggedFiles >= 3 && 'border-chart-3 bg-chart-3/40',
         nbDraggedFiles < 3 && 'border-primary bg-primary/40',
       )}
+      data-testid="drag-overlay"
       initial={{ opacity: 0 }}
       style={{ display: isDraggingOver ? 'flex' : 'none' }}
       transition={{ duration: 0.2 }}
@@ -145,13 +146,13 @@ export function ImageViewer({
         className={cn('absolute top-0 bottom-0 w-1 cursor-ew-resize bg-primary mix-blend-difference shadow-lg transition-colors', isDraggingOver && 'pointer-events-none')}
         initial={{ opacity: 0 }}
         onMouseDown={onMouseDownOnHandle}
+        data-testid="slider-bar"
         style={{ left: `${sliderPosition[0]}%` }}
-        test-id="slider-bar"
         transition={{ duration: 0.2 }}
       >
         <motion.div
           className="absolute top-1/2 left-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 cursor-grab items-center justify-center rounded-full bg-primary shadow-xl active:cursor-grabbing"
-          test-id="slider-handle"
+          data-testid="slider-handle"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >

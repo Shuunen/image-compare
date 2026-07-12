@@ -62,8 +62,13 @@ export async function fetchImageMetadata(url: string): Promise<ImageMetadata> {
   const response = await fetch(url)
   const blob = await response.blob()
   const filename = url.split('/').pop() || 'unknown'
-  const dimensions = await getImageDimensions(url)
-  return { filename, height: dimensions.height, size: blob.size, width: dimensions.width }
+  const objectUrl = globalThis.URL.createObjectURL(blob)
+  try {
+    const dimensions = await getImageDimensions(objectUrl)
+    return { filename, height: dimensions.height, size: blob.size, width: dimensions.width }
+  } finally {
+    globalThis.URL.revokeObjectURL(objectUrl)
+  }
 }
 
 export function handleSingleFileUpload(file: File | undefined, callbacks: ImageUpdateCallbacks): void {
@@ -165,6 +170,6 @@ export function getContainedSize(params: { imageHeight: number; imageWidth: numb
   const { imageWidth, imageHeight, maxWidth, maxHeight } = params
   const aspectRatio = imageWidth / imageHeight
   const maxAspectRatio = maxWidth / maxHeight
-  if (aspectRatio > maxAspectRatio) return { height: maxWidth / aspectRatio, width: maxWidth }
+  if (aspectRatio > maxAspectRatio) return { height: Math.round(maxWidth / aspectRatio), width: Math.round(maxWidth) }
   return { height: Math.round(maxHeight), width: Math.round(maxHeight * aspectRatio) }
 }

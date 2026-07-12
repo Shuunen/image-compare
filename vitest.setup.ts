@@ -1,3 +1,5 @@
+import '@testing-library/jest-dom/vitest'
+
 // Mock fetch to prevent network calls during tests
 vi.spyOn(globalThis, 'fetch').mockResolvedValue({
   blob: () => Promise.resolve(new Blob(['mock-image-data'], { type: 'image/png' })),

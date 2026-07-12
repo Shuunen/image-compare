@@ -24,25 +24,19 @@ export function useContestMode(callbacks: UseContestModeCallbacks): UseContestMo
   }, [callbacks])
 
   useEffect(() => {
+    const updateSideMetadata = (url: string, filename: string, onMetadataUpdate: (metadata: ImageMetadata) => void) => {
+      // oxlint-disable-next-line promise/prefer-await-to-then
+      void fetchImageMetadata(url).then(metadata => {
+        onMetadataUpdate({ ...metadata, filename: filename || metadata.filename })
+        return undefined
+      })
+    }
     if (contestState?.currentMatch) {
-      callbacksRef.current.onLeftImageUpdate(contestState.currentMatch.leftImage.url)
-      callbacksRef.current.onRightImageUpdate(contestState.currentMatch.rightImage.url)
-      // oxlint-disable-next-line promise/prefer-await-to-then
-      void fetchImageMetadata(contestState.currentMatch.leftImage.url).then(metadata => {
-        callbacksRef.current.onLeftMetadataUpdate({
-          ...metadata,
-          filename: contestState.currentMatch?.leftImage.filename ?? metadata.filename,
-        })
-        return undefined
-      })
-      // oxlint-disable-next-line promise/prefer-await-to-then
-      void fetchImageMetadata(contestState.currentMatch.rightImage.url).then(metadata => {
-        callbacksRef.current.onRightMetadataUpdate({
-          ...metadata,
-          filename: contestState.currentMatch?.rightImage.filename ?? metadata.filename,
-        })
-        return undefined
-      })
+      const { leftImage, rightImage } = contestState.currentMatch
+      callbacksRef.current.onLeftImageUpdate(leftImage.url)
+      callbacksRef.current.onRightImageUpdate(rightImage.url)
+      updateSideMetadata(leftImage.url, leftImage.filename, callbacksRef.current.onLeftMetadataUpdate)
+      updateSideMetadata(rightImage.url, rightImage.filename, callbacksRef.current.onRightMetadataUpdate)
     }
   }, [contestState])
 

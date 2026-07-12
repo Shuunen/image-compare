@@ -24,7 +24,7 @@ export function ControlButtons({ contestState, onLeftImageUpload, onReset, onRig
             Change left image
           </Button>
         </label>
-        <input accept="image/*" className="hidden" id="left-upload" onChange={onLeftImageUpload} type="file" />
+        <input accept="image/*" className="hidden" data-testid="left-upload-input" id="left-upload" onChange={onLeftImageUpload} type="file" />
       </div>
       {/* v8 ignore stop -- @preserve */}
 
@@ -41,7 +41,7 @@ export function ControlButtons({ contestState, onLeftImageUpload, onReset, onRig
             Change right image
           </Button>
         </label>
-        <input accept="image/*" className="hidden" id="right-upload" onChange={onRightImageUpload} type="file" />
+        <input accept="image/*" className="hidden" data-testid="right-upload-input" id="right-upload" onChange={onRightImageUpload} type="file" />
       </div>
       {/* v8 ignore stop -- @preserve */}
     </div>

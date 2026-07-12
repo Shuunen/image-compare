@@ -1,7 +1,7 @@
 import { type MouseEvent, type MouseEventHandler, type RefObject, useEffect, useRef, useState } from 'react'
-// oxlint-disable max-lines-per-function, id-length, no-nested-ternary
+// oxlint-disable max-lines-per-function, id-length
 import { functionReturningVoid } from 'shuutils'
-import { calculateNewPan, calculateNewZoom, type DragStartPosition, headerAndControlsHeight, minHeight, minWidth, minZoom, type PanPosition, padding, shouldResetPan } from '../utils/comparison.utils'
+import { calculateNewPan, calculateNewZoom, type DragStartPosition, getCursorType, getImageStyle, headerAndControlsHeight, minHeight, minWidth, minZoom, type PanPosition, padding, shouldResetPan } from '../utils/comparison.utils'
 import { getContainedSize, type ImageMetadata } from '../utils/image.utils'
 
 type UsePanZoomReturn = {
@@ -25,6 +25,16 @@ export function usePanZoom(imageContainerRef: RefObject<HTMLDivElement | null>, 
   const [pan, setPan] = useState<PanPosition>({ x: 0, y: 0 })
   const [isPanning, setIsPanning] = useState(false)
   const dragStartRef = useRef<DragStartPosition>({ panX: 0, panY: 0, x: 0, y: 0 })
+  const zoomRef = useRef(zoom)
+  const metadataRef = useRef({ leftImageMetadata, rightImageMetadata })
+
+  useEffect(() => {
+    zoomRef.current = zoom
+  }, [zoom])
+
+  useEffect(() => {
+    metadataRef.current = { leftImageMetadata, rightImageMetadata }
+  }, [leftImageMetadata, rightImageMetadata])
 
   const changeZoom = (newZoom: number) => {
     setZoom(newZoom)
@@ -36,9 +46,11 @@ export function usePanZoom(imageContainerRef: RefObject<HTMLDivElement | null>, 
     if (!container) return functionReturningVoid
     const handleWheelEvent = (e: globalThis.WheelEvent) => {
       e.preventDefault()
-      const metadata = leftImageMetadata || rightImageMetadata
+      const { leftImageMetadata: left, rightImageMetadata: right } = metadataRef.current
+      const metadata = left || right
+      const currentZoom = zoomRef.current
       if (!metadata?.width || !metadata?.height) {
-        changeZoom(calculateNewZoom(zoom, e.deltaY))
+        changeZoom(calculateNewZoom(currentZoom, e.deltaY))
         return
       }
       const maxWidth = window.innerWidth - padding
@@ -49,14 +61,14 @@ export function usePanZoom(imageContainerRef: RefObject<HTMLDivElement | null>, 
         maxHeight,
         maxWidth,
       })
-      const newZoom = calculateNewZoom(zoom, e.deltaY)
+      const newZoom = calculateNewZoom(currentZoom, e.deltaY)
       const wouldBeWidth = containedSize.width * newZoom
       const wouldBeHeight = containedSize.height * newZoom
       if (wouldBeWidth >= minWidth || wouldBeHeight >= minHeight) changeZoom(newZoom)
     }
     container.addEventListener('wheel', handleWheelEvent, { passive: false })
     return () => container.removeEventListener('wheel', handleWheelEvent)
-  }, [zoom, leftImageMetadata, rightImageMetadata, imageContainerRef])
+  }, [imageContainerRef])
 
   const handleMouseDownOnImage: MouseEventHandler<HTMLDivElement> = e => {
     if (zoom <= minZoom) return
@@ -78,12 +90,9 @@ export function usePanZoom(imageContainerRef: RefObject<HTMLDivElement | null>, 
     if (isPanning && zoom > minZoom) setPan(calculateNewPan(dragStartRef.current, e.clientX, e.clientY))
   }
 
-  const imageStyle = {
-    transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-    transition: isPanning ? 'none' : 'transform 0.1s ease-out',
-  }
+  const imageStyle = getImageStyle(pan, zoom, isPanning)
 
-  const cursor = zoom > minZoom ? (isPanning ? 'grabbing' : 'grab') : 'auto'
+  const cursor = getCursorType(false, zoom, isPanning)
 
   return {
     cursor,

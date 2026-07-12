@@ -101,8 +101,8 @@ describe('image-viewer', () => {
       round: 1,
       winner: { eliminated: false, filename: 'winner.jpg', id: 0, url: 'url' },
     }
-    const { container } = render(<ImageViewer {...mockProps} contestState={contestState} />)
-    const sliderBar = container.querySelector('[test-id="slider-bar"]')
+    render(<ImageViewer {...mockProps} contestState={contestState} />)
+    const sliderBar = screen.getByTestId('slider-bar')
     expect(sliderBar).toBeInstanceOf(HTMLElement)
   })
 

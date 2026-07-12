@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+@import './styles/theme.css';
+@import './styles/scrollbars.css';
+@import './styles/typography.css';
+@plugin "@tailwindcss/typography";
+
+@theme inline {
+  /* Override the default theme with built-in colors or use your own */
+  --color-primary: var(--chart-2);
+  --color-secondary: #df1e69;
+}

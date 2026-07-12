@@ -1,0 +1,10 @@
+.claude/
+.fallow/
+.fallow-baselines/
+.github/
+.gstack/
+.turbo/
+coverage
+dist
+node_modules
+tsconfig.tsbuildinfo

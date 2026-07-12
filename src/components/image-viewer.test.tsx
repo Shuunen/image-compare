@@ -1,0 +1,149 @@
+import { fireEvent, render, screen } from '@testing-library/react'
+import { createRef } from 'react'
+import type { ContestState } from '../utils/comparison.utils'
+import { ImageViewer } from './image-viewer'
+
+describe('image-viewer', () => {
+  const mockProps = {
+    containerHeight: 600,
+    contestState: undefined,
+    cursor: 'auto' as const,
+    imageContainerRef: createRef<HTMLDivElement>(),
+    imageStyle: { transform: 'translate(0px, 0px) scale(1)', transition: 'transform 0.1s ease-out' },
+    isDraggingLeft: false,
+    isDraggingOver: false,
+    leftImage: '/left.jpg',
+    nbDraggedFiles: 0,
+    onDragEnter: vi.fn<() => void>(),
+    onDragLeave: vi.fn<() => void>(),
+    onDragOver: vi.fn<() => void>(),
+    onDrop: vi.fn<() => void>(),
+    onMouseDownOnHandle: vi.fn<() => void>(),
+    onMouseDownOnImage: vi.fn<() => void>(),
+    onMouseLeave: vi.fn<() => void>(),
+    onMouseMove: vi.fn<() => void>(),
+    onMouseUp: vi.fn<() => void>(),
+    onSelectWinner: vi.fn<() => void>(),
+    rightImage: '/right.jpg',
+    sliderPosition: [50],
+    zoom: 1,
+  }
+
+  it('ImageViewer A should render both images', () => {
+    const { container } = render(<ImageViewer {...mockProps} />)
+    const images = container.querySelectorAll('img')
+    expect(images).toHaveLength(2)
+  })
+
+  it('ImageViewer B should display zoom level', () => {
+    render(<ImageViewer {...mockProps} />)
+    const zoomText = screen.getByText('Zoom: 100%')
+    expect(zoomText).toBeInstanceOf(HTMLElement)
+  })
+
+  it('ImageViewer C should not render choose buttons when not in contest mode', () => {
+    render(<ImageViewer {...mockProps} />)
+    expect(screen.queryByText('Choose left image')).toBeNull()
+    expect(screen.queryByText('Choose right image')).toBeNull()
+  })
+
+  it('ImageViewer D should display choose buttons in contest mode', () => {
+    const contestState: ContestState = {
+      activeImages: [],
+      allImages: [],
+      currentMatch: {
+        leftImage: { eliminated: false, filename: 'test.jpg', id: 0, url: 'url' },
+        matchNumber: 1,
+        rightImage: { eliminated: false, filename: 'test2.jpg', id: 1, url: 'url2' },
+      },
+      isComplete: false,
+      matchesCompletedInRound: 0,
+      matchesInRound: 1,
+      round: 1,
+      winner: undefined,
+    }
+    render(<ImageViewer {...mockProps} contestState={contestState} />)
+    const leftButton = screen.getByText('Choose left image')
+    const rightButton = screen.getByText('Choose right image')
+    expect(leftButton).toBeInstanceOf(HTMLElement)
+    expect(rightButton).toBeInstanceOf(HTMLElement)
+  })
+
+  it('ImageViewer E should call onSelectWinner when choose button is clicked', () => {
+    const contestState: ContestState = {
+      activeImages: [],
+      allImages: [],
+      currentMatch: {
+        leftImage: { eliminated: false, filename: 'test.jpg', id: 0, url: 'url' },
+        matchNumber: 1,
+        rightImage: { eliminated: false, filename: 'test2.jpg', id: 1, url: 'url2' },
+      },
+      isComplete: false,
+      matchesCompletedInRound: 0,
+      matchesInRound: 1,
+      round: 1,
+      winner: undefined,
+    }
+    render(<ImageViewer {...mockProps} contestState={contestState} />)
+    const leftButton = screen.getByText('Choose left image')
+    fireEvent.click(leftButton)
+    expect(mockProps.onSelectWinner).toHaveBeenCalledWith(0)
+  })
+
+  it('ImageViewer F should show slider bar even when contest is complete', () => {
+    const contestState: ContestState = {
+      activeImages: [],
+      allImages: [],
+      currentMatch: undefined,
+      isComplete: true,
+      matchesCompletedInRound: 1,
+      matchesInRound: 1,
+      round: 1,
+      winner: { eliminated: false, filename: 'winner.jpg', id: 0, url: 'url' },
+    }
+    render(<ImageViewer {...mockProps} contestState={contestState} />)
+    const sliderBar = screen.getByTestId('slider-bar')
+    expect(sliderBar).toBeInstanceOf(HTMLElement)
+  })
+
+  it('ImageViewer G should show drag over overlay when dragging 2 files', () => {
+    render(<ImageViewer {...mockProps} isDraggingOver nbDraggedFiles={2} />)
+    const dropText = screen.getByText('Drop these 2 images to compare them')
+    expect(dropText).toBeInstanceOf(HTMLElement)
+  })
+
+  it('ImageViewer H should handle right image winning in contest', () => {
+    const contestState: ContestState = {
+      activeImages: [],
+      allImages: [],
+      currentMatch: {
+        leftImage: { eliminated: false, filename: 'test.jpg', id: 0, url: 'url' },
+        matchNumber: 1,
+        rightImage: { eliminated: false, filename: 'test2.jpg', id: 1, url: 'url2' },
+      },
+      isComplete: false,
+      matchesCompletedInRound: 0,
+      matchesInRound: 1,
+      round: 1,
+      winner: undefined,
+    }
+    render(<ImageViewer {...mockProps} contestState={contestState} />)
+    const rightButton = screen.getByText('Choose right image')
+    fireEvent.click(rightButton)
+    expect(mockProps.onSelectWinner).toHaveBeenCalledWith(1)
+  })
+
+  it('ImageViewer I should show left/right side messages when dragging 1 file', () => {
+    render(<ImageViewer {...mockProps} isDraggingLeft isDraggingOver nbDraggedFiles={1} />)
+    const leftMessage = screen.getByText('Change left image')
+    const rightMessage = screen.getByText('Change right image')
+    expect(leftMessage).toBeInstanceOf(HTMLElement)
+    expect(rightMessage).toBeInstanceOf(HTMLElement)
+  })
+
+  it('ImageViewer J should show contest message when dragging 3+ files', () => {
+    render(<ImageViewer {...mockProps} isDraggingOver nbDraggedFiles={3} />)
+    const contestMessage = screen.getByText('Drop these 3 images to start a contest')
+    expect(contestMessage).toBeInstanceOf(HTMLElement)
+  })
+})

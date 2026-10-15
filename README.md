@@ -7,6 +7,7 @@ Compare two images side by side with a draggable slider
 
 ## Thanks
 
+- [Knip](https://github.com/webpro/knip) : super tool to find & fix problems
 - [Svg Omg](https://jakearchibald.github.io/svgomg/) : the great king of svg file size reduction
 - [Boxy Svg](https://boxy-svg.com) : simple & effective svg editor
 - [Github](https://github.com) : for all their great work year after year, pushing OSS forward

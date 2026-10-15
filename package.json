@@ -26,6 +26,7 @@
     "@vitest/ui": "^4.1.10",
     "bun": "^1.3.14",
     "happy-dom": "^20.10.6",
+    "knip": "~6.41.0",
     "oxfmt": "^0.58.0",
     "oxlint": "^1.73.0",
     "oxlint-tsgolint": "^0.24.0",
@@ -65,11 +66,14 @@
     "lint:tests": "bun src/bin/lint.cli.ts --target=src/**/*.test.{ts,tsx} && echo lint:tests completed successfully || (echo Please fix test lint issues && exit 1)",
     "lint:types": "tsc -p tsconfig.app.json && tsc -p tsconfig.node.json && echo lint:types completed successfully || (echo Please fix type errors and run pnpm run lint:types to check for remaining type issues && exit 1)",
     "preview": "vite preview",
-    "test": "turbo run test:unit",
+    "test": "turbo run test:unit && echo test success",
     "test:ui": "vitest --ui",
     "test:unit": "vitest run --coverage && echo test:unit completed successfully || (echo Please fix test errors and run pnpm run test:unit to check for remaining test issues && exit 1)",
     "test:watch": "vitest",
-    "up:deps": "pnpm update --latest && echo up:deps completed successfully"
+    "up:deps": "pnpm update --latest && echo up:deps completed successfully",
+    "lint:knip": "knip && echo lint:knip success",
+    "preversion": "pnpm check",
+    "postversion": "git push && git push --tags"
   },
   "type": "module",
   "version": "0.0.1"

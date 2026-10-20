@@ -1,4 +1,4 @@
-import { cn } from 'shuutils'
+import { cn } from '../../utils/cn.utils'
 
 type SliderProps = {
   className?: string

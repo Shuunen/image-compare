@@ -1,16 +1,15 @@
-import { motion, type Variants } from 'framer-motion'
-// oxlint-disable no-multi-comp, id-length, no-magic-numbers
-import { cn } from 'shuutils'
+import { motion, stagger, type Variants } from 'framer-motion'
 import { Paragraph } from '../components/ui/paragraph'
 import { Title } from '../components/ui/title'
+// oxlint-disable no-multi-comp, id-length, no-magic-numbers
+import { cn } from '../utils/cn.utils'
 
 const containerAnimation = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
     transition: {
-      delayChildren: 0.1,
-      staggerChildren: 0.15,
+      delayChildren: stagger(0.15, { startDelay: 0.1 }),
     },
   },
 } satisfies Variants

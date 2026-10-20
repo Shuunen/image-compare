@@ -1,5 +1,5 @@
 import type { JSX, ReactNode } from 'react'
-import { cn } from 'shuutils'
+import { cn } from '../../utils/cn.utils'
 
 const levelClasses = {
   1: 'text-2xl font-bold',

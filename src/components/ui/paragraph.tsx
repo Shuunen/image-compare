@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { cn } from 'shuutils'
+import { cn } from '../../utils/cn.utils'
 
 type ParagraphProps = {
   children: ReactNode

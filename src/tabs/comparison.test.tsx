@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { sleep } from 'shuutils'
 import { Comparison } from './comparison.tab'
 
@@ -154,11 +154,10 @@ describe('comparison', () => {
         files: [file1, file2],
       },
     })
-    await sleep(20)
-    const leftImage = screen.getByAltText('left')
-    const rightImage = screen.getByAltText('right')
-    expect(leftImage).toHaveAttribute('src', expect.stringContaining('data:'))
-    expect(rightImage).toHaveAttribute('src', expect.stringContaining('data:'))
+    await waitFor(() => {
+      expect(screen.getByAltText('left')).toHaveAttribute('src', expect.stringContaining('data:'))
+      expect(screen.getByAltText('right')).toHaveAttribute('src', expect.stringContaining('data:'))
+    })
   })
 
   it('Comparison P should handle slider handle drag', () => {
@@ -201,9 +200,9 @@ describe('comparison', () => {
     const fileInput = screen.getByTestId('left-upload-input')
     const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })
     fireEvent.change(fileInput, { target: { files: [file] } })
-    await sleep(20)
-    const leftImage = screen.getByAltText('left')
-    expect(leftImage).toHaveAttribute('src', expect.stringContaining('data:'))
+    await waitFor(() => {
+      expect(screen.getByAltText('left')).toHaveAttribute('src', expect.stringContaining('data:'))
+    })
   })
 
   it('Comparison T should handle right image upload', async () => {
@@ -211,9 +210,9 @@ describe('comparison', () => {
     const fileInput = screen.getByTestId('right-upload-input')
     const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })
     fireEvent.change(fileInput, { target: { files: [file] } })
-    await sleep(20)
-    const rightImage = screen.getByAltText('right')
-    expect(rightImage).toHaveAttribute('src', expect.stringContaining('data:'))
+    await waitFor(() => {
+      expect(screen.getByAltText('right')).toHaveAttribute('src', expect.stringContaining('data:'))
+    })
   })
 
   it('Comparison U should handle zoom triggering pan reset', () => {

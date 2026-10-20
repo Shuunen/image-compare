@@ -1,2 +1,5 @@
-onlyBuiltDependencies:
-  - bun
+allowBuilds:
+  bun: true
+overrides:
+  postcss-selector-parser: '>=7.1.6'
+  source-map-js: '>=1.2.2'

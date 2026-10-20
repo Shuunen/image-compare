@@ -1,6 +1,6 @@
 import { logger } from './logger.utils'
 
-export const requiredFilesCount = 2
+const requiredFilesCount = 2
 
 export type ImageMetadata = {
   filename: string
@@ -31,7 +31,7 @@ export type MultipleImagesUpdateCallbacks = {
   onContestStart: (images: ImageData[]) => void
 }
 
-export function readImageFile(file: File, onSuccess: (dataUrl: string) => void, onError: (error: string) => void): void {
+function readImageFile(file: File, onSuccess: (dataUrl: string) => void, onError: (error: string) => void): void {
   const reader = new FileReader()
   // oxlint-disable-next-line prefer-add-event-listener
   reader.onload = event => {

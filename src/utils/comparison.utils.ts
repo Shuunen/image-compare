@@ -16,9 +16,9 @@ export const minHeight = 400
 export const minWidth = 700
 export const minZoom = 0.1
 export const maxZoom = 5
-export const zoomSensitivity = 0.001
+const zoomSensitivity = 0.001
 export const defaultSliderPosition = 50
-export const maxPercentage = 100
+const maxPercentage = 100
 export const padding = 48
 export const headerAndControlsHeight = 382
 
@@ -56,7 +56,7 @@ export function shouldResetPan(zoom: number): boolean {
   return zoom === minZoom
 }
 
-export type ContestImage = {
+type ContestImage = {
   url: string
   id: number
   eliminated: boolean

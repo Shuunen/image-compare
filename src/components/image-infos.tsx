@@ -1,6 +1,6 @@
 // oxlint-disable no-magic-numbers
 
-import { cn } from 'shuutils'
+import { cn } from '../utils/cn.utils'
 import type { ImageMetadata } from '../utils/image.utils'
 import { Paragraph } from './ui/paragraph'
 

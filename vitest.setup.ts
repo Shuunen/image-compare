@@ -40,3 +40,7 @@ vi.spyOn(globalThis.document, 'createElement').mockImplementation((tagName: stri
   }
   return originalCreateElement(tagName)
 })
+
+// happy-dom >= 20.12 ships Element.animate(), which makes framer-motion use native animations whose cancellation rejects unhandled in tests, remove it to fall back to JS animations
+// @ts-expect-error animate is intentionally removed from the test environment
+delete globalThis.Element.prototype.animate

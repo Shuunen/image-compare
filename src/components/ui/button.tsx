@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { cn } from 'shuutils'
+import { cn } from '../../utils/cn.utils'
 
 const variantClasses = {
   default: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90',

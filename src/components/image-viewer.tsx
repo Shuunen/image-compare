@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import type { MouseEvent, MouseEventHandler, RefObject } from 'react'
 // oxlint-disable id-length, no-magic-numbers
-import { cn } from 'shuutils'
+import { cn } from '../utils/cn.utils'
 import type { ContestState, CursorType, ImageStyle } from '../utils/comparison.utils'
 import { Button } from './ui/button'
 

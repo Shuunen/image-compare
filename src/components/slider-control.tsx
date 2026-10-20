@@ -1,4 +1,4 @@
-import { cn } from 'shuutils'
+import { cn } from '../utils/cn.utils'
 import { Slider } from './ui/slider'
 
 type SliderControlProps = {

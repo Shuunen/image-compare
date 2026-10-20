@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { memo, useMemo } from 'react'
 // oxlint-disable id-length
-import { cn } from 'shuutils'
+import { cn } from '../utils/cn.utils'
 import type { ContestState } from '../utils/comparison.utils'
 import type { ImageMetadata } from '../utils/image.utils'
 import { logger } from '../utils/logger.utils'
@@ -21,7 +21,7 @@ function getTitle(isContestComplete: boolean, isContestMode: boolean, contestSta
   return ''
 }
 
-export const ContestHeader = memo((props: ContestHeaderProps) => {
+function ContestHeaderBase(props: ContestHeaderProps) {
   const { contestState, leftImageMetadata, rightImageMetadata } = props
   const isContestMode = contestState !== undefined && !contestState.isComplete
   const isContestComplete = contestState?.isComplete ?? false
@@ -39,6 +39,8 @@ export const ContestHeader = memo((props: ContestHeaderProps) => {
       </div>
     </motion.div>
   )
-})
+}
+
+export const ContestHeader = memo(ContestHeaderBase)
 
 ContestHeader.displayName = 'ContestHeader'

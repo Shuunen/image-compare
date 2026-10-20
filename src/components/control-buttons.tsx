@@ -1,6 +1,6 @@
 import { RotateCcw, Upload } from 'lucide-react'
 // oxlint-disable id-length
-import { cn } from 'shuutils'
+import { cn } from '../utils/cn.utils'
 import type { ContestState } from '../utils/comparison.utils'
 import { Button } from './ui/button'
 

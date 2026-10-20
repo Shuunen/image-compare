@@ -1,4 +1,4 @@
-import { type MouseEvent, type MouseEventHandler, type RefObject, useEffect, useRef, useState } from 'react'
+import { type MouseEvent, type MouseEventHandler, type RefObject, useCallback, useEffect, useRef, useState } from 'react'
 // oxlint-disable max-lines-per-function, id-length
 import { functionReturningVoid } from 'shuutils'
 import { calculateNewPan, calculateNewZoom, type DragStartPosition, getCursorType, getImageStyle, headerAndControlsHeight, minHeight, minWidth, minZoom, type PanPosition, padding, shouldResetPan } from '../utils/comparison.utils'
@@ -36,10 +36,10 @@ export function usePanZoom(imageContainerRef: RefObject<HTMLDivElement | null>, 
     metadataRef.current = { leftImageMetadata, rightImageMetadata }
   }, [leftImageMetadata, rightImageMetadata])
 
-  const changeZoom = (newZoom: number) => {
+  const changeZoom = useCallback((newZoom: number) => {
     setZoom(newZoom)
     if (shouldResetPan(newZoom)) setPan({ x: 0, y: 0 })
-  }
+  }, [])
 
   useEffect(() => {
     const container = imageContainerRef.current
@@ -68,7 +68,7 @@ export function usePanZoom(imageContainerRef: RefObject<HTMLDivElement | null>, 
     }
     container.addEventListener('wheel', handleWheelEvent, { passive: false })
     return () => container.removeEventListener('wheel', handleWheelEvent)
-  }, [imageContainerRef])
+  }, [changeZoom, imageContainerRef])
 
   const handleMouseDownOnImage: MouseEventHandler<HTMLDivElement> = e => {
     if (zoom <= minZoom) return

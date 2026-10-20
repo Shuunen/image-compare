@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, stagger } from 'framer-motion'
 import { useMemo, useRef } from 'react'
 // oxlint-disable id-length
 import { Logger } from 'shuutils'
@@ -13,6 +13,8 @@ import { usePanZoom } from '../hooks/use-pan-zoom'
 import { useSlider } from '../hooks/use-slider'
 import { createContestState, defaultSliderPosition, headerAndControlsHeight, minHeight, minWidth, padding, startContest } from '../utils/comparison.utils'
 import { getContainedSize } from '../utils/image.utils'
+
+const tabStaggerDelay = 0.1
 
 // oxlint-disable-next-line max-lines-per-function
 export function Comparison() {
@@ -90,7 +92,12 @@ export function Comparison() {
 
   return (
     <div className="flex h-[calc(100vh-56px)] grow flex-col items-center justify-center overflow-hidden bg-accent p-6" data-testid="comparison-tab">
-      <motion.div animate={{ opacity: 1, width: containerWidth, y: 0 }} className="flex flex-col" initial={{ opacity: 0, y: 20 }} transition={{ duration: 0.5, staggerChildren: 0.1, width: { duration: 0.3, ease: 'easeInOut' } }}>
+      <motion.div
+        animate={{ opacity: 1, width: containerWidth, y: 0 }}
+        className="flex flex-col"
+        initial={{ opacity: 0, y: 20 }}
+        transition={{ delayChildren: stagger(tabStaggerDelay), duration: 0.5, width: { duration: 0.3, ease: 'easeInOut' } }}
+      >
         <motion.div animate={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: -10 }} transition={{ delay: 0.1, duration: 0.4 }}>
           <ContestHeader contestState={contestState} leftImageMetadata={leftImageMetadata} rightImageMetadata={rightImageMetadata} />
         </motion.div>

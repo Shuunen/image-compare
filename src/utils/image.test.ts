@@ -144,6 +144,7 @@ describe('image.utils', () => {
       const result = await fetchImageMetadata('http://example.com/image.jpg')
       expect(objectSerialize(result)).toMatchInlineSnapshot(`"{"filename":"image.jpg","height":1080,"size":15,"width":1920}"`)
     })
+
     it('fetchImageMetadata B should handle missing filename in URL', async () => {
       const result = await fetchImageMetadata('')
       expect(result.filename).toBe('unknown')

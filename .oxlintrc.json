@@ -87,6 +87,7 @@
   ],
   "plugins": ["import", "jsdoc", "oxc", "promise", "react", "react-perf", "typescript", "unicorn", "vitest"],
   "rules": {
+    "one-var": "off",
     "array-type": "off",
     "capitalized-comments": "off",
     "consistent-indexed-object-style": "off",

@@ -6,12 +6,15 @@ import { ContestHeader } from '../components/contest-header'
 import { ControlButtons } from '../components/control-buttons'
 import { ImageViewer } from '../components/image-viewer'
 import { SliderControl } from '../components/slider-control'
+import { VideoControl } from '../components/video-control'
 import { useContestMode } from '../hooks/use-contest-mode'
 import { useDragDrop } from '../hooks/use-drag-drop'
+import { useFrameExtraction } from '../hooks/use-frame-extraction'
 import { useImageState } from '../hooks/use-image-state'
 import { usePanZoom } from '../hooks/use-pan-zoom'
 import { useSlider } from '../hooks/use-slider'
-import { createContestState, defaultSliderPosition, headerAndControlsHeight, minHeight, minWidth, padding, startContest } from '../utils/comparison.utils'
+import { useVideoSync } from '../hooks/use-video-sync'
+import { createContestState, defaultSliderPosition, headerAndControlsHeight, minHeight, minWidth, padding, startContest, videoControlHeight } from '../utils/comparison.utils'
 import { getContainedSize } from '../utils/image.utils'
 
 const tabStaggerDelay = 0.1
@@ -23,7 +26,25 @@ export function Comparison() {
 
   const { leftImage, leftImageMetadata, rightImage, rightImageMetadata, setLeftImage, setLeftImageMetadata, setRightImage, setRightImageMetadata } = useImageState()
 
-  const { cursor, handleMouseDownOnImage, handleMouseMove: panMouseMove, handleMouseUpOrLeave: panMouseUpOrLeave, imageStyle, isPanning, setPan, setZoom, zoom } = usePanZoom(imageContainerRef, leftImageMetadata, rightImageMetadata)
+  const hasVideo = Boolean(leftImageMetadata?.isVideo || rightImageMetadata?.isVideo || leftImageMetadata?.frameSource || rightImageMetadata?.frameSource)
+  const reservedHeight = headerAndControlsHeight + (hasVideo ? videoControlHeight : 0)
+
+  const {
+    cursor,
+    handleMouseDownOnImage,
+    handleMouseMove: panMouseMove,
+    handleMouseUpOrLeave: panMouseUpOrLeave,
+    imageStyle,
+    isPanning,
+    setPan,
+    setZoom,
+    zoom,
+  } = usePanZoom(imageContainerRef, { left: leftImageMetadata, right: rightImageMetadata }, reservedHeight)
+
+  const isLeftVideo = leftImageMetadata?.isVideo ?? false
+  const isRightVideo = rightImageMetadata?.isVideo ?? false
+  const { canPlay, currentTime, duration, isPlaying, leftVideoRef, rightVideoRef, seek, togglePlay } = useVideoSync({ left: leftImageMetadata, right: rightImageMetadata })
+  const { isLeftExtracting, isRightExtracting } = useFrameExtraction(currentTime, { metadata: leftImageMetadata, onFrame: setLeftImage }, { metadata: rightImageMetadata, onFrame: setRightImage })
 
   const { handleMouseDownOnHandle, handleMouseMove: sliderMouseMove, handleMouseUpOrLeave: sliderMouseUpOrLeave, setSliderPosition, sliderPosition } = useSlider(imageContainerRef)
 
@@ -74,7 +95,7 @@ export function Comparison() {
     const metadata = leftImageMetadata || rightImageMetadata
     if (!metadata?.width || !metadata?.height) return { containerHeight: 'auto', containerWidth: '100%' }
     const maxWidth = window.innerWidth - padding
-    const maxHeight = window.innerHeight - headerAndControlsHeight
+    const maxHeight = window.innerHeight - reservedHeight
     const containedSize = getContainedSize({
       imageHeight: metadata.height,
       imageWidth: metadata.width,
@@ -87,7 +108,7 @@ export function Comparison() {
       containerHeight: Math.max(Math.min(zoomedHeight, maxHeight), minHeight),
       containerWidth: Math.max(Math.min(zoomedWidth, maxWidth), minWidth),
     }
-  }, [leftImageMetadata, rightImageMetadata, zoom])
+  }, [leftImageMetadata, rightImageMetadata, reservedHeight, zoom])
   /* v8 ignore stop */
 
   return (
@@ -110,7 +131,12 @@ export function Comparison() {
             imageStyle={imageStyle}
             isDraggingLeft={isDraggingLeft}
             isDraggingOver={isDraggingOver}
+            isLeftExtracting={isLeftExtracting}
+            isLeftVideo={isLeftVideo}
+            isRightExtracting={isRightExtracting}
+            isRightVideo={isRightVideo}
             leftImage={leftImage}
+            leftVideoRef={leftVideoRef}
             nbDraggedFiles={nbDraggedFiles}
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
@@ -122,7 +148,9 @@ export function Comparison() {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUpOrLeave}
             onSelectWinner={handleSelectWinnerWrapper}
+            reservedHeight={reservedHeight}
             rightImage={rightImage}
+            rightVideoRef={rightVideoRef}
             sliderPosition={sliderPosition}
             zoom={zoom}
           />
@@ -130,6 +158,7 @@ export function Comparison() {
         <motion.div animate={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: 10 }} transition={{ delay: 0.3, duration: 0.4 }}>
           <SliderControl onValueChange={setSliderPosition} value={sliderPosition} />
         </motion.div>
+        {hasVideo && <VideoControl canPlay={canPlay} currentTime={currentTime} duration={duration} isPlaying={isPlaying} onSeek={seek} onTogglePlay={togglePlay} />}
         <motion.div animate={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: 10 }} transition={{ delay: 0.4, duration: 0.4 }}>
           <ControlButtons contestState={contestState} onLeftImageUpload={handleLeftImageUpload} onReset={handleReset} onRightImageUpload={handleRightImageUpload} />
         </motion.div>

@@ -3,7 +3,7 @@
 [![Project license](https://img.shields.io/github/license/Shuunen/image-compare.svg?color=informational)](https://github.com/Shuunen/image-compare/blob/master/LICENSE)
 [![Visitors](https://hits.sh/github.com/Shuunen/image-compare.svg?label=visitors&color=informational)](https://hits.sh/github.com/Shuunen/image-compare/)
 
-Compare two images side by side with a draggable slider
+> Compare two images side by side with a draggable slider
 
 ## Thanks
 

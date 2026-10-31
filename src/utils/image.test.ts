@@ -127,12 +127,14 @@ describe('image.utils', () => {
       expect(onLeftMetadataUpdate).toHaveBeenCalledWith({
         filename: 'test1.jpg',
         height: 1080,
+        isVideo: false,
         size: file1.size,
         width: 1920,
       })
       expect(onRightMetadataUpdate).toHaveBeenCalledWith({
         filename: 'test2.jpg',
         height: 1080,
+        isVideo: false,
         size: file2.size,
         width: 1920,
       })

@@ -1,7 +1,7 @@
 import { type MouseEvent, type MouseEventHandler, type RefObject, useCallback, useEffect, useRef, useState } from 'react'
 // oxlint-disable max-lines-per-function, id-length
 import { functionReturningVoid } from 'shuutils'
-import { calculateNewPan, calculateNewZoom, type DragStartPosition, getCursorType, getImageStyle, headerAndControlsHeight, minHeight, minWidth, minZoom, type PanPosition, padding, shouldResetPan } from '../utils/comparison.utils'
+import { calculateNewPan, calculateNewZoom, type DragStartPosition, getCursorType, getImageStyle, minHeight, minWidth, minZoom, type PanPosition, padding, shouldResetPan } from '../utils/comparison.utils'
 import { getContainedSize, type ImageMetadata } from '../utils/image.utils'
 
 type UsePanZoomReturn = {
@@ -20,17 +20,23 @@ type UsePanZoomReturn = {
   zoom: number
 }
 
-export function usePanZoom(imageContainerRef: RefObject<HTMLDivElement | null>, leftImageMetadata: ImageMetadata | undefined, rightImageMetadata: ImageMetadata | undefined): UsePanZoomReturn {
+export function usePanZoom(imageContainerRef: RefObject<HTMLDivElement | null>, metadatas: { left: ImageMetadata | undefined; right: ImageMetadata | undefined }, reservedHeight: number): UsePanZoomReturn {
+  const { left: leftImageMetadata, right: rightImageMetadata } = metadatas
   const [zoom, setZoom] = useState(1)
   const [pan, setPan] = useState<PanPosition>({ x: 0, y: 0 })
   const [isPanning, setIsPanning] = useState(false)
   const dragStartRef = useRef<DragStartPosition>({ panX: 0, panY: 0, x: 0, y: 0 })
   const zoomRef = useRef(zoom)
   const metadataRef = useRef({ leftImageMetadata, rightImageMetadata })
+  const reservedHeightRef = useRef(reservedHeight)
 
   useEffect(() => {
     zoomRef.current = zoom
   }, [zoom])
+
+  useEffect(() => {
+    reservedHeightRef.current = reservedHeight
+  }, [reservedHeight])
 
   useEffect(() => {
     metadataRef.current = { leftImageMetadata, rightImageMetadata }
@@ -54,7 +60,7 @@ export function usePanZoom(imageContainerRef: RefObject<HTMLDivElement | null>, 
         return
       }
       const maxWidth = window.innerWidth - padding
-      const maxHeight = window.innerHeight - headerAndControlsHeight
+      const maxHeight = window.innerHeight - reservedHeightRef.current
       const containedSize = getContainedSize({
         imageHeight: metadata.height,
         imageWidth: metadata.width,

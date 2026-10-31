@@ -21,6 +21,8 @@ export const defaultSliderPosition = 50
 const maxPercentage = 100
 export const padding = 48
 export const headerAndControlsHeight = 382
+// the seek row shown under the slider when a video is loaded
+export const videoControlHeight = 70
 
 export function calculateNewZoom(currentZoom: number, deltaY: number): number {
   const newZoom = currentZoom - deltaY * zoomSensitivity

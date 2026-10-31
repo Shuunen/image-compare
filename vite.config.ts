@@ -15,6 +15,8 @@ export default defineConfig({
       },
     },
   },
+  // ffmpeg spawns its own worker, pre-bundling breaks the worker url
+  optimizeDeps: { exclude: ['@ffmpeg/ffmpeg'] },
   plugins: [react(), tailwindcss(), uniqueMark()],
   // dedicated ports, so apps never collide when running together
   preview: { port: 4104, strictPort: true },

@@ -124,6 +124,8 @@ async function applyFile(file: File, url: string, callbacks: { onImageUpdate: (u
       try {
         const frameSource = await loadFrameSource(file)
         ;({ metadata, url: mediaUrl } = frameSource)
+        // the video itself is not displayed, only its frames are
+        globalThis.URL.revokeObjectURL(url)
       } catch (error) {
         logger.error('frame extraction failed', error)
       }

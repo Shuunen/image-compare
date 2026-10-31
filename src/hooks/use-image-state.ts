@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchImageMetadata, type ImageMetadata } from '../utils/image.utils'
 
 type UseImageStateReturn = {
@@ -17,9 +17,21 @@ const defaultImages = {
   before: '/sample-image-blue.svg',
 }
 
+// videos and extracted frames are object urls, they hold memory until revoked
+function useReleasingImage(initial: string): [string, (image: string) => void] {
+  const [image, setImage] = useState(initial)
+  const imageRef = useRef(initial)
+  const replaceImage = useCallback((next: string) => {
+    if (imageRef.current !== next && imageRef.current.startsWith('blob:')) globalThis.URL.revokeObjectURL(imageRef.current)
+    imageRef.current = next
+    setImage(next)
+  }, [])
+  return [image, replaceImage]
+}
+
 export function useImageState(): UseImageStateReturn {
-  const [leftImage, setLeftImage] = useState(defaultImages.before)
-  const [rightImage, setRightImage] = useState(defaultImages.after)
+  const [leftImage, setLeftImage] = useReleasingImage(defaultImages.before)
+  const [rightImage, setRightImage] = useReleasingImage(defaultImages.after)
   const [leftImageMetadata, setLeftImageMetadata] = useState<ImageMetadata | undefined>(undefined)
   const [rightImageMetadata, setRightImageMetadata] = useState<ImageMetadata | undefined>(undefined)
 

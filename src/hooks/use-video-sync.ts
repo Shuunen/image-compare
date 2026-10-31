@@ -1,5 +1,5 @@
 // oxlint-disable max-lines-per-function
-import { type RefCallback, useCallback, useEffect, useState } from 'react'
+import { type RefCallback, useCallback, useEffect, useRef, useState } from 'react'
 import type { ImageMetadata } from '../utils/image.utils'
 import { maxVideoDrift } from '../utils/video.utils'
 
@@ -18,6 +18,19 @@ type UseVideoSyncReturn = {
 function getSharedDuration(videoDuration: number | undefined, sources: { left: ImageMetadata | undefined; right: ImageMetadata | undefined }): number {
   const durations = [videoDuration, sources.left?.frameSource?.duration, sources.right?.frameSource?.duration].filter(value => value !== undefined)
   return durations.length > 0 ? Math.min(...durations) : 0
+}
+
+// new media means a fresh timeline, the video that stays must not keep playing from its old position
+function useRewindOnNewMedia(sources: unknown, getVideos: () => HTMLVideoElement[]) {
+  const rewoundSourcesRef = useRef(sources)
+  useEffect(() => {
+    if (rewoundSourcesRef.current === sources) return
+    rewoundSourcesRef.current = sources
+    for (const video of getVideos()) {
+      video.pause()
+      video.currentTime = 0
+    }
+  }, [getVideos, sources])
 }
 
 /**
@@ -52,6 +65,8 @@ export function useVideoSync(sources: { left: ImageMetadata | undefined; right: 
 
   const getVideos = useCallback(() => [leftVideo, rightVideo].filter(video => video !== undefined), [leftVideo, rightVideo])
 
+  useRewindOnNewMedia(previousSources, getVideos)
+
   useEffect(() => {
     const videos = [leftVideo, rightVideo].filter(video => video !== undefined)
     const [primary] = videos
@@ -64,9 +79,13 @@ export function useVideoSync(sources: { left: ImageMetadata | undefined; right: 
       setCurrentTime(primary.currentTime)
       for (const video of videos) if (video !== primary && Math.abs(video.currentTime - primary.currentTime) > maxVideoDrift) video.currentTime = primary.currentTime
     }
-    const handleEnded = () => {
+    const handleEnded = async () => {
       for (const video of videos) video.currentTime = 0
-      if (videos.length > 0) void Promise.all(videos.map(video => video.play()))
+      try {
+        await Promise.all(videos.map(video => video.play()))
+      } catch {
+        setIsPlaying(false)
+      }
     }
     for (const video of videos) if (video.readyState > 0) video.dispatchEvent(new Event('loadedmetadata'))
     for (const video of videos) video.addEventListener('loadedmetadata', updateDuration)

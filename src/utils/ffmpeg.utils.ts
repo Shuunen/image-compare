@@ -18,8 +18,18 @@ async function loadFfmpeg(): Promise<FFmpeg> {
   return ffmpeg
 }
 
+async function loadFfmpegOnce(): Promise<FFmpeg> {
+  try {
+    return await loadFfmpeg()
+  } catch (error) {
+    // a failed load (offline, flaky network) must not be cached, the next video can try again
+    ffmpegPromise = undefined
+    throw error
+  }
+}
+
 function getFfmpeg(): Promise<FFmpeg> {
-  ffmpegPromise ??= loadFfmpeg()
+  ffmpegPromise ??= loadFfmpegOnce()
   return ffmpegPromise
 }
 

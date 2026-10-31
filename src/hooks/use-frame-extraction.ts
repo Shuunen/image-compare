@@ -5,6 +5,8 @@ import { logger } from '../utils/logger.utils'
 
 // the very end of a video has no frame to decode
 const lastFrameMargin = 0.05
+// milliseconds to wait for the seek time to settle before extracting a frame
+const extractionDelay = 120
 
 type FrameSide = {
   metadata: ImageMetadata | undefined
@@ -40,8 +42,12 @@ function useSideFrames(currentTime: number, side: FrameSide): boolean {
       }
       if (!controller.signal.aborted) setSettled({ source: frameSource, time: currentTime })
     }
-    void extract()
-    return () => controller.abort()
+    // dragging the seek slider changes the time many times a second, only the last position is worth an extraction
+    const timer = globalThis.setTimeout(() => void extract(), extractionDelay)
+    return () => {
+      globalThis.clearTimeout(timer)
+      controller.abort()
+    }
   }, [currentTime, frameSource, onFrame])
 
   return frameSource !== undefined && (settled.source !== frameSource || settled.time !== currentTime)

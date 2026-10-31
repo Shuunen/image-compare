@@ -16,6 +16,9 @@ export default defineConfig({
     },
   },
   plugins: [react(), tailwindcss(), uniqueMark()],
+  // dedicated ports, so apps never collide when running together
+  preview: { port: 4104, strictPort: true },
+  server: { port: 5104, strictPort: true },
   test: {
     coverage: {
       exclude: ['**/hooks/**'],

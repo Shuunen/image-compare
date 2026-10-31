@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { sleep } from 'shuutils'
 import { Comparison } from './comparison.tab'
 
 describe('comparison', () => {
@@ -189,10 +188,13 @@ describe('comparison', () => {
         files: [file1, file2, file3, file4],
       },
     })
-    await sleep(20)
-    expect(screen.getByText('Round 1 - Match 1')).toBeInstanceOf(HTMLElement)
+    await waitFor(() => {
+      expect(screen.getByText('Round 1 - Match 1')).toBeInstanceOf(HTMLElement)
+    })
     fireEvent.click(screen.getByText('Choose left image'))
-    expect(screen.getByText('Round 1 - Match 2')).toBeInstanceOf(HTMLElement)
+    await waitFor(() => {
+      expect(screen.getByText('Round 1 - Match 2')).toBeInstanceOf(HTMLElement)
+    })
   })
 
   it('Comparison S should handle left image upload', async () => {

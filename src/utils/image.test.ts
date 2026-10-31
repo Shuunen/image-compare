@@ -41,6 +41,54 @@ describe('image.utils', () => {
     })
   })
 
+  describe('video upload', () => {
+    // Value: protects=videos are loaded through an object url instead of a data url; fails_when=a video is read with FileReader or the url is not forwarded; why_new=video branch of readImageFile was untested; seam=none; no_claim=metadata loading (happy-dom never loads video metadata)
+    it('handleSingleFileUpload D should load a video file through an object url', () => {
+      const file = new File(['video'], 'clip.mp4', { type: 'video/mp4' })
+      const createUrl = vi.spyOn(globalThis.URL, 'createObjectURL').mockReturnValue('blob:clip')
+      handleSingleFileUpload(file, { imageSide: 'left', onImageUpdate: vi.fn<() => void>() })
+      expect(createUrl).toHaveBeenCalledWith(file)
+      createUrl.mockRestore()
+    })
+
+    // Value: protects=mkv files are handed to the browser as webm; fails_when=the mkv file is passed unchanged or typed matroska; why_new=mkv blob rewrite was untested; seam=none; no_claim=actual mkv playback
+    it('handleSingleFileUpload E should retype an mkv file as a webm blob', () => {
+      const file = new File(['video'], 'clip.MKV', { type: '' })
+      const createUrl = vi.spyOn(globalThis.URL, 'createObjectURL').mockReturnValue('blob:clip')
+      handleSingleFileUpload(file, { imageSide: 'left', onImageUpdate: vi.fn<() => void>() })
+      const [blob] = createUrl.mock.calls[0] ?? []
+      expect(blob).toBeInstanceOf(Blob)
+      expect(blob).not.toBe(file)
+      expect(blob).toHaveProperty('type', 'video/webm')
+      createUrl.mockRestore()
+    })
+
+    // Value: protects=an unreadable file applies nothing and shows an error; fails_when=callbacks fire or the success log appears after a decode failure; why_new=applyFile failure branch was untested; seam=none; no_claim=video frame extraction (ffmpeg untouched)
+    it('handleSingleFileUpload F should fire no callback when the image cannot be decoded', async () => {
+      await sleep(50)
+      const brokenImage = new globalThis.Image()
+      vi.spyOn(globalThis.document, 'createElement').mockImplementationOnce(() => {
+        Object.defineProperty(brokenImage, 'src', {
+          get: () => '',
+          set() {
+            brokenImage.dispatchEvent(new Event('error'))
+          },
+        })
+        return brokenImage
+      })
+      const showError = vi.spyOn(logger, 'showError').mockImplementation(functionReturningVoid)
+      const info = vi.spyOn(logger, 'info').mockImplementation(functionReturningVoid)
+      const onImageUpdate = vi.fn<() => void>()
+      const onMetadataUpdate = vi.fn<() => void>()
+      handleSingleFileUpload(new File(['x'], 'bad.jpg', { type: 'image/jpeg' }), { imageSide: 'left', onImageUpdate, onMetadataUpdate })
+      await sleep(50)
+      expect(showError).toHaveBeenCalledWith(expect.stringContaining('bad.jpg'))
+      expect(onImageUpdate).not.toHaveBeenCalled()
+      expect(onMetadataUpdate).not.toHaveBeenCalled()
+      expect(info).not.toHaveBeenCalled()
+    })
+  })
+
   describe(handleMultipleFilesUpload, () => {
     it('handleMultipleFilesUpload A should show error for single file', () => {
       const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })

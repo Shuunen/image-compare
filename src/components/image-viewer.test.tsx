@@ -12,7 +12,12 @@ describe('image-viewer', () => {
     imageStyle: { transform: 'translate(0px, 0px) scale(1)', transition: 'transform 0.1s ease-out' },
     isDraggingLeft: false,
     isDraggingOver: false,
+    isLeftExtracting: false,
+    isLeftVideo: false,
+    isRightExtracting: false,
+    isRightVideo: false,
     leftImage: '/left.jpg',
+    leftVideoRef: vi.fn<() => void>(),
     nbDraggedFiles: 0,
     onDragEnter: vi.fn<() => void>(),
     onDragLeave: vi.fn<() => void>(),
@@ -24,7 +29,9 @@ describe('image-viewer', () => {
     onMouseMove: vi.fn<() => void>(),
     onMouseUp: vi.fn<() => void>(),
     onSelectWinner: vi.fn<() => void>(),
+    reservedHeight: 382,
     rightImage: '/right.jpg',
+    rightVideoRef: vi.fn<() => void>(),
     sliderPosition: [50],
     zoom: 1,
   }
@@ -33,6 +40,30 @@ describe('image-viewer', () => {
     const { container } = render(<ImageViewer {...mockProps} />)
     const images = container.querySelectorAll('img')
     expect(images).toHaveLength(2)
+  })
+
+  it('ImageViewer A2 should render videos when media are videos', () => {
+    render(<ImageViewer {...mockProps} isLeftVideo isRightVideo />)
+    expect(screen.getByTestId('left-video')).toHaveAttribute('src', '/left.jpg')
+    expect(screen.getByTestId('right-video')).toHaveAttribute('src', '/right.jpg')
+  })
+
+  it('ImageViewer A3 should not show loaders when nothing is extracted', () => {
+    render(<ImageViewer {...mockProps} />)
+    expect(screen.queryByTestId('left-frame-loader')).toBeNull()
+    expect(screen.queryByTestId('right-frame-loader')).toBeNull()
+  })
+
+  it('ImageViewer A4 should show a loader only over the left side', () => {
+    render(<ImageViewer {...mockProps} isLeftExtracting />)
+    expect(screen.getByTestId('left-frame-loader')).toHaveTextContent('Extracting frame')
+    expect(screen.queryByTestId('right-frame-loader')).toBeNull()
+  })
+
+  it('ImageViewer A5 should show a loader only over the right side', () => {
+    render(<ImageViewer {...mockProps} isRightExtracting />)
+    expect(screen.getByTestId('right-frame-loader')).toHaveStyle({ left: '50%' })
+    expect(screen.queryByTestId('left-frame-loader')).toBeNull()
   })
 
   it('ImageViewer B should display zoom level', () => {

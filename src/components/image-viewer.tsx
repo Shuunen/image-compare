@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
-import type { MouseEvent, MouseEventHandler, RefObject } from 'react'
+import type { MouseEvent, MouseEventHandler, RefCallback, RefObject } from 'react'
 // oxlint-disable id-length, no-magic-numbers
 import { cn } from '../utils/cn.utils'
 import type { ContestState, CursorType, ImageStyle } from '../utils/comparison.utils'
+import { FrameLoader } from './frame-loader'
+import { Media } from './media'
 import { Button } from './ui/button'
 
 type ImageViewerProps = {
@@ -13,7 +15,12 @@ type ImageViewerProps = {
   imageStyle: ImageStyle
   isDraggingLeft: boolean
   isDraggingOver: boolean
+  isLeftExtracting: boolean
+  isLeftVideo: boolean
+  isRightExtracting: boolean
+  isRightVideo: boolean
   leftImage: string
+  leftVideoRef: RefCallback<HTMLVideoElement>
   nbDraggedFiles: number
   onDragEnter: (e: React.DragEvent) => void
   onDragLeave: (e: React.DragEvent) => void
@@ -25,7 +32,9 @@ type ImageViewerProps = {
   onMouseMove: (e: MouseEvent) => void
   onMouseUp: () => void
   onSelectWinner: (winnerId: number) => void
+  reservedHeight: number
   rightImage: string
+  rightVideoRef: RefCallback<HTMLVideoElement>
   sliderPosition: number[]
   zoom: number
 }
@@ -87,7 +96,12 @@ export function ImageViewer({
   imageStyle,
   isDraggingLeft,
   isDraggingOver,
+  isLeftExtracting,
+  isLeftVideo,
+  isRightExtracting,
+  isRightVideo,
   leftImage,
+  leftVideoRef,
   nbDraggedFiles,
   onDragEnter,
   onDragLeave,
@@ -99,7 +113,9 @@ export function ImageViewer({
   onMouseMove,
   onMouseUp,
   onSelectWinner,
+  reservedHeight,
   rightImage,
+  rightVideoRef,
   sliderPosition,
   zoom,
 }: ImageViewerProps) {
@@ -107,7 +123,7 @@ export function ImageViewer({
   return (
     <motion.div
       animate={{ height: containerHeight }}
-      className="relative mb-8 max-h-[calc(100vh-382px)] overflow-hidden rounded-xl"
+      className="relative mb-8 overflow-hidden rounded-xl"
       data-testid="image-viewer"
       onDragEnter={onDragEnter}
       onDragLeave={onDragLeave}
@@ -118,7 +134,7 @@ export function ImageViewer({
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
       ref={imageContainerRef}
-      style={{ cursor }}
+      style={{ cursor, maxHeight: `calc(100vh - ${reservedHeight}px)` }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
       {/* v8 ignore start -- @preserve */}
@@ -126,7 +142,7 @@ export function ImageViewer({
       {/* v8 ignore stop -- @preserve */}
 
       <motion.div animate={{ opacity: 1 }} className="pointer-events-none absolute inset-0 select-none" initial={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-        <img alt="right" className="size-full object-contain" src={rightImage} style={imageStyle} />
+        <Media alt="right" imageStyle={imageStyle} isVideo={isRightVideo} src={rightImage} videoRef={rightVideoRef} />
       </motion.div>
 
       <motion.div
@@ -138,7 +154,7 @@ export function ImageViewer({
         }}
         transition={{ damping: 30, opacity: { duration: 0.3 }, stiffness: 300, type: 'spring' }}
       >
-        <img alt="left" className="size-full object-contain" src={leftImage} style={imageStyle} />
+        <Media alt="left" imageStyle={imageStyle} isVideo={isLeftVideo} src={leftImage} videoRef={leftVideoRef} />
       </motion.div>
 
       <motion.div
@@ -162,6 +178,8 @@ export function ImageViewer({
           </div>
         </motion.div>
       </motion.div>
+      {isLeftExtracting && <FrameLoader side="left" style={{ left: 0, width: `${sliderPosition[0]}%` }} />}
+      {isRightExtracting && <FrameLoader side="right" style={{ left: `${sliderPosition[0]}%`, right: 0 }} />}
       <motion.div
         animate={{ opacity: 1, scale: 1 }}
         className={cn('pointer-events-none absolute right-2 bottom-2 rounded bg-accent/50 px-2 py-1 text-xs text-accent-foreground')}

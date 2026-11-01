@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.1] - 2026-07-12
+### Added
 
-### Added in 0.0.1
+- Video comparison: load videos on either side, a second slider appears below to play, pause and seek both videos in sync
+- Videos the browser can't play (mkv with unsupported codecs, ...) are compared frame by frame, a frame is extracted with ffmpeg wasm at each seek, no conversion, with a loader over the side being processed
+- Fixed the layout overflowing the app (cut header and buttons) when the video seek row is shown
+
+## [0.0.1] - 2026-07-12
 
 - Initial release: image comparison tool with draggable slider
 

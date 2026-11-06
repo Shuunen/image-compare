@@ -1,7 +1,14 @@
 // oxlint-disable max-lines-per-function
 import { type RefCallback, useCallback, useEffect, useRef, useState } from 'react'
 import type { ImageMetadata } from '../utils/image.utils'
-import { maxVideoDrift } from '../utils/video.utils'
+import { clampVideoTime, maxVideoDrift, type VideoSide } from '../utils/video.utils'
+
+// how far each video is moved from the shared timeline, to line up videos that differ by an intro for example
+type VideoOffsets = Record<VideoSide, number>
+
+const noOffsets: VideoOffsets = { left: 0, right: 0 }
+
+type SideVideo = { side: VideoSide; video: HTMLVideoElement }
 
 type UseVideoSyncReturn = {
   currentTime: number
@@ -9,8 +16,10 @@ type UseVideoSyncReturn = {
   duration: number
   isPlaying: boolean
   leftVideoRef: RefCallback<HTMLVideoElement>
+  offsets: VideoOffsets
   rightVideoRef: RefCallback<HTMLVideoElement>
   seek: (time: number) => void
+  shift: (side: VideoSide, delta: number) => void
   togglePlay: () => Promise<void>
 }
 
@@ -33,6 +42,22 @@ function useRewindOnNewMedia(sources: unknown, getVideos: () => HTMLVideoElement
   }, [getVideos, sources])
 }
 
+// callback refs stored in state, so listeners are re-bound when a video element mounts or unmounts
+function useSideVideos() {
+  const [leftVideo, setLeftVideo] = useState<HTMLVideoElement | undefined>(undefined)
+  const [rightVideo, setRightVideo] = useState<HTMLVideoElement | undefined>(undefined)
+  const leftVideoRef = useCallback((node: HTMLVideoElement | null) => setLeftVideo(node ?? undefined), [])
+  const rightVideoRef = useCallback((node: HTMLVideoElement | null) => setRightVideo(node ?? undefined), [])
+  const getSideVideos = useCallback(() => {
+    const sideVideos: SideVideo[] = []
+    if (leftVideo) sideVideos.push({ side: 'left', video: leftVideo })
+    if (rightVideo) sideVideos.push({ side: 'right', video: rightVideo })
+    return sideVideos
+  }, [leftVideo, rightVideo])
+  const getVideos = useCallback(() => getSideVideos().map(({ video }) => video), [getSideVideos])
+  return { getSideVideos, getVideos, leftVideoRef, rightVideoRef }
+}
+
 /**
  * Keep the left and right videos on the same timeline : one play/pause, one seek.
  * Videos the browser can't play have no element, they only contribute their duration and follow the seek time.
@@ -42,12 +67,11 @@ function useRewindOnNewMedia(sources: unknown, getVideos: () => HTMLVideoElement
  * @returns refs to attach to the video elements and the shared playback state
  */
 export function useVideoSync(sources: { left: ImageMetadata | undefined; right: ImageMetadata | undefined }): UseVideoSyncReturn {
-  // callback refs stored in state, so listeners are re-bound when a video element mounts or unmounts
-  const [leftVideo, setLeftVideo] = useState<HTMLVideoElement | undefined>(undefined)
-  const [rightVideo, setRightVideo] = useState<HTMLVideoElement | undefined>(undefined)
+  const { getSideVideos, getVideos, leftVideoRef, rightVideoRef } = useSideVideos()
   const [currentTime, setCurrentTime] = useState(0)
   const [videoDuration, setVideoDuration] = useState<number | undefined>(undefined)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [offsets, setOffsets] = useState<VideoOffsets>(noOffsets)
 
   const [previousSources, setPreviousSources] = useState(sources)
   // new media means a fresh timeline, reset during render rather than in an effect
@@ -56,31 +80,32 @@ export function useVideoSync(sources: { left: ImageMetadata | undefined; right: 
     setCurrentTime(0)
     setVideoDuration(undefined)
     setIsPlaying(false)
+    setOffsets(noOffsets)
   }
 
   const duration = getSharedDuration(videoDuration, sources)
 
-  const leftVideoRef = useCallback((node: HTMLVideoElement | null) => setLeftVideo(node ?? undefined), [])
-  const rightVideoRef = useCallback((node: HTMLVideoElement | null) => setRightVideo(node ?? undefined), [])
-
-  const getVideos = useCallback(() => [leftVideo, rightVideo].filter(video => video !== undefined), [leftVideo, rightVideo])
-
   useRewindOnNewMedia(previousSources, getVideos)
 
   useEffect(() => {
-    const videos = [leftVideo, rightVideo].filter(video => video !== undefined)
-    const [primary] = videos
+    const sideVideos = getSideVideos()
+    const [primary] = sideVideos
     if (!primary) return () => undefined
+    const videos = sideVideos.map(({ video }) => video)
     const updateDuration = () => {
       const loadedDurations = videos.map(video => video.duration).filter(value => Number.isFinite(value))
       setVideoDuration(loadedDurations.length > 0 ? Math.min(...loadedDurations) : undefined)
     }
     const handleTimeUpdate = () => {
-      setCurrentTime(primary.currentTime)
-      for (const video of videos) if (video !== primary && Math.abs(video.currentTime - primary.currentTime) > maxVideoDrift) video.currentTime = primary.currentTime
+      const sharedTime = primary.video.currentTime - offsets[primary.side]
+      setCurrentTime(sharedTime)
+      for (const { side, video } of sideVideos) {
+        const wanted = clampVideoTime(sharedTime + offsets[side], video.duration)
+        if (video !== primary.video && Math.abs(video.currentTime - wanted) > maxVideoDrift) video.currentTime = wanted
+      }
     }
     const handleEnded = async () => {
-      for (const video of videos) video.currentTime = 0
+      for (const { side, video } of sideVideos) video.currentTime = clampVideoTime(offsets[side], video.duration)
       try {
         await Promise.all(videos.map(video => video.play()))
       } catch {
@@ -89,40 +114,55 @@ export function useVideoSync(sources: { left: ImageMetadata | undefined; right: 
     }
     for (const video of videos) if (video.readyState > 0) video.dispatchEvent(new Event('loadedmetadata'))
     for (const video of videos) video.addEventListener('loadedmetadata', updateDuration)
-    primary.addEventListener('timeupdate', handleTimeUpdate)
-    primary.addEventListener('ended', handleEnded)
+    primary.video.addEventListener('timeupdate', handleTimeUpdate)
+    primary.video.addEventListener('ended', handleEnded)
     return () => {
       for (const video of videos) video.removeEventListener('loadedmetadata', updateDuration)
-      primary.removeEventListener('timeupdate', handleTimeUpdate)
-      primary.removeEventListener('ended', handleEnded)
+      primary.video.removeEventListener('timeupdate', handleTimeUpdate)
+      primary.video.removeEventListener('ended', handleEnded)
     }
-  }, [leftVideo, rightVideo])
+  }, [getSideVideos, offsets])
 
   const seek = useCallback(
     (time: number) => {
-      for (const video of getVideos()) video.currentTime = time
+      for (const { side, video } of getSideVideos()) video.currentTime = clampVideoTime(time + offsets[side], video.duration)
       setCurrentTime(time)
     },
-    [getVideos],
+    [getSideVideos, offsets],
+  )
+
+  // the shift is kept until new media are loaded, so seeking elsewhere keeps the videos in sync
+  const shift = useCallback(
+    (side: VideoSide, delta: number) => {
+      const next = offsets[side] + delta
+      setOffsets({ ...offsets, [side]: next })
+      const target = getSideVideos().find(item => item.side === side)
+      if (target) target.video.currentTime = clampVideoTime(currentTime + next, target.video.duration)
+    },
+    [currentTime, getSideVideos, offsets],
   )
 
   const togglePlay = useCallback(async () => {
-    const videos = getVideos()
+    const sideVideos = getSideVideos()
+    const videos = sideVideos.map(item => item.video)
     if (isPlaying) {
       for (const video of videos) video.pause()
       setIsPlaying(false)
       return
     }
     // align them before starting so they begin together
-    const [primary] = videos
-    if (primary) for (const video of videos) video.currentTime = primary.currentTime
+    const [primary] = sideVideos
+    if (primary) {
+      const sharedTime = primary.video.currentTime - offsets[primary.side]
+      for (const { side, video } of sideVideos) video.currentTime = clampVideoTime(sharedTime + offsets[side], video.duration)
+    }
     setIsPlaying(true)
     try {
       await Promise.all(videos.map(video => video.play()))
     } catch {
       setIsPlaying(false)
     }
-  }, [getVideos, isPlaying])
+  }, [getSideVideos, isPlaying, offsets])
 
-  return { canPlay: !sources.left?.frameSource && !sources.right?.frameSource, currentTime, duration, isPlaying, leftVideoRef, rightVideoRef, seek, togglePlay }
+  return { canPlay: !sources.left?.frameSource && !sources.right?.frameSource, currentTime, duration, isPlaying, leftVideoRef, offsets, rightVideoRef, seek, shift, togglePlay }
 }

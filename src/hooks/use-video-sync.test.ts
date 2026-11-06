@@ -132,4 +132,24 @@ describe('use-video-sync', () => {
     expect(play).toHaveBeenCalledTimes(2)
     expect(result.current.isPlaying).toBe(false)
   })
+
+  // Value: protects=a shift between the two videos survives seeking elsewhere and is dropped with new media; fails_when=the shift is lost on seek or kept for new media; why_new=shift is new; seam=none; no_claim=real playback
+  it('useVideoSync H should keep the shift when seeking and reset it with new media', () => {
+    const { rerender, result } = renderHook(({ sources }) => useVideoSync(sources), { initialProps: { sources: { left: leftMeta, right: rightMeta } } })
+    const left = createVideo(100)
+    const right = createVideo(100)
+    act(() => {
+      result.current.leftVideoRef(left)
+      result.current.rightVideoRef(right)
+    })
+    act(() => result.current.seek(10))
+    act(() => result.current.shift('left', 5))
+    expect(left.currentTime).toBe(15)
+    expect(right.currentTime).toBe(10)
+    act(() => result.current.seek(20))
+    expect(left.currentTime).toBe(25)
+    expect(right.currentTime).toBe(20)
+    rerender({ sources: { left: leftMeta, right: { ...rightMeta } } })
+    expect(result.current.offsets).toStrictEqual({ left: 0, right: 0 })
+  })
 })

@@ -87,7 +87,11 @@ function getVideoDimensions(src: string): Promise<{ height: number; width: numbe
   return new Promise((resolve, reject) => {
     const video = globalThis.document.createElement('video')
     video.preload = 'metadata'
-    video.addEventListener('loadedmetadata', () => resolve({ height: video.videoHeight, width: video.videoWidth }))
+    video.addEventListener('loadedmetadata', () => {
+      // audio-only decoding (e.g. hevc video track): metadata loads but the picture has no size, treat as unplayable
+      if (video.videoWidth === 0 || video.videoHeight === 0) reject(new Error('Video track cannot be decoded'))
+      else resolve({ height: video.videoHeight, width: video.videoWidth })
+    })
     video.addEventListener('error', () => reject(new Error('Failed to load video')))
     video.src = src
   })

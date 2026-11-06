@@ -9,3 +9,12 @@
   --color-primary: var(--chart-2);
   --color-secondary: #df1e69;
 }
+
+/* video mode turns the green accent into purple, so it is obvious which mode is active */
+:root[data-mode='video'] {
+  --chart-2: oklch(0.55 0.22 300);
+}
+
+:root[data-mode='video'].dark {
+  --chart-2: oklch(0.68 0.2 300);
+}

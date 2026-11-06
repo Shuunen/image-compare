@@ -11,16 +11,22 @@ const extractionDelay = 120
 type FrameSide = {
   metadata: ImageMetadata | undefined
   onFrame: (url: string) => void
+  /** shift of this side from the shared seek time */
+  offset?: number
 }
 
 /**
  * Keep the displayed image of an unplayable video on the shared seek time.
- * @param currentTime the shared seek time in seconds
- * @param side the media metadata and the setter of its displayed image
+ * @param sharedTime the shared seek time in seconds
+ * @param side the media metadata, the setter of its displayed image and its shift from the shared time
+ * @param side.metadata the media metadata
+ * @param side.offset the shift from the shared time in seconds
+ * @param side.onFrame the setter of the displayed image
  * @returns true while the frame of the current seek time is not displayed yet, extracted frames are given to the side setter
  */
-function useSideFrames(currentTime: number, side: FrameSide): boolean {
-  const { metadata, onFrame } = side
+function useSideFrames(sharedTime: number, side: FrameSide): boolean {
+  const { metadata, offset = 0, onFrame } = side
+  const currentTime = Math.max(0, sharedTime + offset)
   const frameSource = metadata?.frameSource
   const currentUrlRef = useRef<string | undefined>(undefined)
   // the last extraction that ended, derived rather than set in the effect so loading starts with the seek

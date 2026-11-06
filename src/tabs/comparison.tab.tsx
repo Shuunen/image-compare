@@ -1,5 +1,5 @@
 import { motion, stagger } from 'framer-motion'
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 // oxlint-disable id-length
 import { Logger } from 'shuutils'
 import { ContestHeader } from '../components/contest-header'
@@ -16,6 +16,7 @@ import { useSlider } from '../hooks/use-slider'
 import { useVideoSync } from '../hooks/use-video-sync'
 import { createContestState, defaultSliderPosition, headerAndControlsHeight, minHeight, minWidth, padding, startContest, videoControlHeight } from '../utils/comparison.utils'
 import { getContainedSize } from '../utils/image.utils'
+import { setMediaMode } from '../utils/media-mode.utils'
 
 const tabStaggerDelay = 0.1
 
@@ -27,6 +28,10 @@ export function Comparison() {
   const { leftImage, leftImageMetadata, rightImage, rightImageMetadata, setLeftImage, setLeftImageMetadata, setRightImage, setRightImageMetadata } = useImageState()
 
   const hasVideo = Boolean(leftImageMetadata?.isVideo || rightImageMetadata?.isVideo || leftImageMetadata?.frameSource || rightImageMetadata?.frameSource)
+  useEffect(() => {
+    setMediaMode(hasVideo ? 'video' : 'image')
+    return () => setMediaMode('image')
+  }, [hasVideo])
   const reservedHeight = headerAndControlsHeight + (hasVideo ? videoControlHeight : 0)
 
   const {
@@ -43,8 +48,8 @@ export function Comparison() {
 
   const isLeftVideo = leftImageMetadata?.isVideo ?? false
   const isRightVideo = rightImageMetadata?.isVideo ?? false
-  const { canPlay, currentTime, duration, isPlaying, leftVideoRef, rightVideoRef, seek, togglePlay } = useVideoSync({ left: leftImageMetadata, right: rightImageMetadata })
-  const { isLeftExtracting, isRightExtracting } = useFrameExtraction(currentTime, { metadata: leftImageMetadata, onFrame: setLeftImage }, { metadata: rightImageMetadata, onFrame: setRightImage })
+  const { canPlay, currentTime, duration, isPlaying, leftVideoRef, offsets, rightVideoRef, seek, shift, togglePlay } = useVideoSync({ left: leftImageMetadata, right: rightImageMetadata })
+  const { isLeftExtracting, isRightExtracting } = useFrameExtraction(currentTime, { metadata: leftImageMetadata, offset: offsets.left, onFrame: setLeftImage }, { metadata: rightImageMetadata, offset: offsets.right, onFrame: setRightImage })
 
   const { handleMouseDownOnHandle, handleMouseMove: sliderMouseMove, handleMouseUpOrLeave: sliderMouseUpOrLeave, setSliderPosition, sliderPosition } = useSlider(imageContainerRef)
 
@@ -160,7 +165,7 @@ export function Comparison() {
         </motion.div>
         {hasVideo && <VideoControl canPlay={canPlay} currentTime={currentTime} duration={duration} isPlaying={isPlaying} onSeek={seek} onTogglePlay={togglePlay} />}
         <motion.div animate={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: 10 }} transition={{ delay: 0.4, duration: 0.4 }}>
-          <ControlButtons contestState={contestState} onLeftImageUpload={handleLeftImageUpload} onReset={handleReset} onRightImageUpload={handleRightImageUpload} />
+          <ControlButtons contestState={contestState} onLeftImageUpload={handleLeftImageUpload} onReset={handleReset} onRightImageUpload={handleRightImageUpload} onShift={shift} />
         </motion.div>
       </motion.div>
     </div>

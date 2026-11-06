@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import type { ContestState } from '../utils/comparison.utils'
+import { setMediaMode } from '../utils/media-mode.utils'
 import { ControlButtons } from './control-buttons'
 
 describe('control-buttons', () => {
@@ -116,5 +117,16 @@ describe('control-buttons', () => {
       fireEvent.change(fileInput, { target: { files: [file] } })
       expect(mockRightUpload).toHaveBeenCalledWith(expect.any(Object))
     }
+  })
+
+  it('ControlButtons Z should show the shift buttons only in video mode and report the delta', () => {
+    const onShift = vi.fn<(side: string, delta: number) => void>()
+    render(<ControlButtons contestState={undefined} onLeftImageUpload={mockLeftUpload} onReset={mockReset} onRightImageUpload={mockRightUpload} onShift={onShift} />)
+    expect(screen.queryByTestId('shift-left')).toBeNull()
+    act(() => setMediaMode('video'))
+    fireEvent.click(screen.getByTestId('shift-right-+1s'))
+    expect(onShift).toHaveBeenCalledWith('right', 1)
+    expect(screen.getAllByTestId(/^shift-(?<side>left|right)-/u)).toHaveLength(12)
+    act(() => setMediaMode('image'))
   })
 })

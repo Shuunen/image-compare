@@ -3,6 +3,7 @@ import type { MouseEvent, MouseEventHandler, RefCallback, RefObject } from 'reac
 // oxlint-disable id-length, no-magic-numbers
 import { cn } from '../utils/cn.utils'
 import type { ContestState, CursorType, ImageStyle } from '../utils/comparison.utils'
+import { useMediaMode } from '../utils/media-mode.utils'
 import { FrameLoader } from './frame-loader'
 import { Media } from './media'
 import { Button } from './ui/button'
@@ -40,6 +41,7 @@ type ImageViewerProps = {
 }
 
 function DragOverlay({ isDraggingLeft, isDraggingOver, nbDraggedFiles }: { isDraggingLeft: boolean; isDraggingOver: boolean; nbDraggedFiles: number }) {
+  const mediaName = useMediaMode()
   return (
     <motion.div
       animate={{ opacity: isDraggingOver ? 1 : 0 }}
@@ -61,7 +63,7 @@ function DragOverlay({ isDraggingLeft, isDraggingOver, nbDraggedFiles }: { isDra
             initial={{ scale: 0.9 }}
             transition={{ duration: 0.2 }}
           >
-            Change left image
+            Change left {mediaName}
           </motion.div>
           <motion.div
             animate={{ scale: isDraggingLeft ? 1 : 1.2 }}
@@ -69,18 +71,18 @@ function DragOverlay({ isDraggingLeft, isDraggingOver, nbDraggedFiles }: { isDra
             initial={{ scale: 0.9 }}
             transition={{ duration: 0.3 }}
           >
-            Change right image
+            Change right {mediaName}
           </motion.div>
         </motion.div>
       )}
       {nbDraggedFiles === 2 && (
         <motion.div animate={{ scale: isDraggingOver ? 1 : 0.9 }} className="rounded-lg bg-background/80 px-6 py-3 text-lg font-semibold text-foreground" initial={{ scale: 0.9 }} transition={{ duration: 0.2 }}>
-          Drop these 2 images to compare them
+          Drop these 2 {mediaName}s to compare them
         </motion.div>
       )}
       {nbDraggedFiles >= 3 && (
         <motion.div animate={{ scale: isDraggingOver ? 1 : 0.9 }} className="rounded-lg bg-background/80 px-6 py-3 text-lg font-semibold text-foreground" initial={{ scale: 0.9 }} transition={{ duration: 0.2 }}>
-          Drop these {nbDraggedFiles} images to start a contest
+          Drop these {nbDraggedFiles} {mediaName}s to start a contest
         </motion.div>
       )}
     </motion.div>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 440" width="900" height="440" role="img" aria-label="Image Compare demo: drag the slider to reveal the before and after versions">
+<title>Image Compare demo: drag the slider to reveal the before and after versions</title>
+<style>
+text{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.m{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre}
+
+@keyframes mv{0%,8%{transform:translateX(350px)}28%,38%{transform:translateX(50px)}68%,78%{transform:translateX(650px)}95%,100%{transform:translateX(350px)}}.clipmove{animation:mv 10s infinite ease-in-out}
+@keyframes mv2{0%,8%{transform:translateX(350px)}28%,38%{transform:translateX(50px)}68%,78%{transform:translateX(650px)}95%,100%{transform:translateX(350px)}}.slider{animation:mv2 10s infinite ease-in-out}
+</style>
+<rect width="900" height="440" rx="16" fill="#0f172a"/>
+<defs><filter id="bw"><feColorMatrix type="saturate" values="0"/></filter><clipPath id="cl"><rect class="clipmove" transform="translate(350 0)" x="-600" y="60" width="700" height="320"/></clipPath></defs>
+<g><rect x="100" y="60" width="700" height="320" fill="#7dd3fc"/><circle cx="640" cy="140" r="46" fill="#fde047"/><path d="M100 380 V280 Q220 190 340 270 T560 250 T800 280 V380 Z" fill="#16a34a"/><path d="M100 380 V320 Q260 260 420 320 T800 310 V380 Z" fill="#15803d"/></g>
+<g clip-path="url(#cl)"><g class="clipcounter" filter="url(#bw)"><rect x="100" y="60" width="700" height="320" fill="#7dd3fc"/><circle cx="640" cy="140" r="46" fill="#fde047"/><path d="M100 380 V280 Q220 190 340 270 T560 250 T800 280 V380 Z" fill="#16a34a"/><path d="M100 380 V320 Q260 260 420 320 T800 310 V380 Z" fill="#15803d"/></g></g>
+<g class="slider" transform="translate(350 0)"><rect x="98" y="52" width="4" height="336" fill="#fff"/><circle cx="100" cy="220" r="18" fill="#fff" stroke="#64748b"/><path d="M93 220 l6 -6 v12 z M107 220 l-6 -6 v12 z" fill="#475569"/></g>
+<text x="116" y="84" fill="#fff" font-size="14" font-weight="700" style="paint-order:stroke;stroke:#0008;stroke-width:3px">before</text>
+<text x="784" y="84" fill="#fff" font-size="14" font-weight="700" text-anchor="end" style="paint-order:stroke;stroke:#0008;stroke-width:3px">after</text>
+<text x="450" y="36" fill="#f1f5f9" font-size="24" font-weight="700" text-anchor="middle">Image Compare</text>
+<text x="450" y="415" fill="#94a3b8" font-size="15" text-anchor="middle">drag the slider, or compare two videos side by side</text>
+</svg>

@@ -1,30 +1,15 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "globalDependencies": ["package.json", "pnpm-lock.yaml"],
   "tasks": {
-    "build:tsc": {
-      "inputs": ["src/**", "tsconfig*.json"]
-    },
-    "build:vite": {
-      "dependsOn": ["build:tsc"],
-      "inputs": ["src/**", "index.html", "public/**", "tsconfig*.json", "vite.config.ts"],
-      "outputs": ["dist/**"]
-    },
-    "lint:format": {
-      "inputs": ["src/**", ".github/**", ".oxfmtrc.jsonc", "*.{ts,js,json,md,yaml,yml}"]
-    },
-    "lint:issues": {
-      "inputs": ["src/**/*.{ts,tsx}", ".oxlintrc.json", "tsconfig*.json"]
-    },
-    "lint:types": {
-      "inputs": ["src/**/*.{ts,tsx}", "tsconfig*.json"]
-    },
-    "lint:tests": {
-      "inputs": ["src/**/*.test.{ts,tsx}", "src/bin/lint.*.ts"]
-    },
-    "test:unit": {
-      "inputs": ["src/**/*.{ts,tsx}", "vite.config.ts"],
-      "outputs": ["coverage/**"]
-    }
+    "lint:install": { "inputs": ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"] },
+    "build:tsc": { "dependsOn": ["lint:install"] },
+    "build:vite": { "dependsOn": ["build:tsc"], "outputs": ["dist/**"] },
+    "lint:format": { "dependsOn": ["lint:install"] },
+    "lint:issues": { "dependsOn": ["lint:install"] },
+    "lint:types": { "dependsOn": ["lint:install"] },
+    "lint:tests": { "dependsOn": ["lint:install"] },
+    "lint:knip": { "dependsOn": ["lint:install"] },
+    "test:unit": { "dependsOn": ["lint:install"], "outputs": ["coverage/**"] },
+    "lint:repo": { "dependsOn": ["build:vite"] }
   }
 }

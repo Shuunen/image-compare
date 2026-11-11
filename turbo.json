@@ -1,15 +1,38 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "tasks": {
-    "lint:install": { "inputs": ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"] },
-    "build:tsc": { "dependsOn": ["lint:install"] },
-    "build:vite": { "dependsOn": ["build:tsc"], "outputs": ["dist/**"] },
-    "lint:format": { "dependsOn": ["lint:install"] },
-    "lint:issues": { "dependsOn": ["lint:install"] },
-    "lint:types": { "dependsOn": ["lint:install"] },
-    "lint:tests": { "dependsOn": ["lint:install"] },
-    "lint:knip": { "dependsOn": ["lint:install"] },
-    "test:unit": { "dependsOn": ["lint:install"], "outputs": ["coverage/**"] },
-    "lint:repo": { "dependsOn": ["build:vite"] }
+    "build:tsc": {
+      "dependsOn": ["lint:install"]
+    },
+    "build:vite": {
+      "dependsOn": ["build:tsc", "lint:install"],
+      "outputs": ["dist/**"]
+    },
+    "lint:format": {
+      "dependsOn": ["lint:install"]
+    },
+    "lint:install": {
+      "inputs": ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"]
+    },
+    "lint:issues": {
+      "dependsOn": ["lint:install"]
+    },
+    "lint:knip": {
+      "dependsOn": ["lint:install"]
+    },
+    "lint:repo": {
+      "dependsOn": ["build:vite", "lint:install", "build:tsc"],
+      "inputs": ["$TURBO_DEFAULT$", "dist/**"]
+    },
+    "lint:tests": {
+      "dependsOn": ["lint:install"]
+    },
+    "lint:types": {
+      "dependsOn": ["lint:install"]
+    },
+    "test:unit": {
+      "dependsOn": ["lint:install"],
+      "outputs": ["coverage/**"]
+    }
   }
 }

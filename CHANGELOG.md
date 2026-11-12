@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed videos with an undecodable video track (e.g. HEVC mkv) showing 0 × 0 and not playing, they now fall back to frame by frame
 - Fixed the layout overflowing the app (cut header and buttons) when the video seek row is shown
 
+### Changed
+
+- Add a VS Code colour scheme to tell this project window apart
+
 ## [0.0.1] - 2026-07-12
 
 - Initial release: image comparison tool with draggable slider

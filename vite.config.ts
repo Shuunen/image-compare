@@ -25,6 +25,9 @@ export default defineConfig({
     coverage: {
       exclude: ['**/hooks/**'],
       provider: 'v8' as const,
+      thresholds: {
+        100: true,
+      },
     },
     environment: 'happy-dom',
     globals: true,

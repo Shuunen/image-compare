@@ -63,6 +63,17 @@ describe('image.utils', () => {
       createUrl.mockRestore()
     })
 
+    it('handleSingleFileUpload G should show an error when the file cannot be read', () => {
+      const showError = vi.spyOn(logger, 'showError').mockImplementation(functionReturningVoid)
+      const readAsDataUrl = vi.spyOn(FileReader.prototype, 'readAsDataURL').mockImplementation(function mockRead(this: FileReader) {
+        this.onerror?.(new Event('error') as ProgressEvent<FileReader>)
+      })
+      handleSingleFileUpload(new File(['content'], 'test.jpg', { type: 'image/jpeg' }), { imageSide: 'left', onImageUpdate: vi.fn<() => void>() })
+      expect(showError).toHaveBeenCalledWith('Failed to read left image file: result is not a string.')
+      readAsDataUrl.mockRestore()
+      showError.mockRestore()
+    })
+
     // Value: protects=an unreadable file applies nothing and shows an error; fails_when=callbacks fire or the success log appears after a decode failure; why_new=applyFile failure branch was untested; seam=none; no_claim=video frame extraction (ffmpeg untouched)
     it('handleSingleFileUpload F should fire no callback when the image cannot be decoded', async () => {
       await sleep(50)

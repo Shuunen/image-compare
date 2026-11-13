@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, MemoryRouter } from 'react-router-dom'
+import { setMediaMode } from '../utils/media-mode.utils'
 import { App } from './app.page'
 
 describe('App', () => {
@@ -19,5 +20,16 @@ describe('App', () => {
       </BrowserRouter>,
     )
     expect(getAllByText('Image Compare').length).toBeGreaterThan(0)
+  })
+
+  it('should name the comparison tab after the video mode', () => {
+    setMediaMode('video')
+    const { getAllByText } = render(
+      <MemoryRouter initialEntries={['/about']}>
+        <App />
+      </MemoryRouter>,
+    )
+    expect(getAllByText('Video Compare').length).toBeGreaterThan(0)
+    setMediaMode('image')
   })
 })

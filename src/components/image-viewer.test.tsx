@@ -177,4 +177,14 @@ describe('image-viewer', () => {
     const contestMessage = screen.getByText('Drop these 3 images to start a contest')
     expect(contestMessage).toBeInstanceOf(HTMLElement)
   })
+
+  it('ImageViewer K should keep the 1 file messages when the drag is over the right side', () => {
+    render(<ImageViewer {...mockProps} isDraggingOver nbDraggedFiles={1} />)
+    expect(screen.getByText('Change right image')).toBeInstanceOf(HTMLElement)
+  })
+
+  it.each([1, 2, 3])('ImageViewer L should render the %i file message while the drag is not over the viewer', nbDraggedFiles => {
+    render(<ImageViewer {...mockProps} isDraggingOver={false} nbDraggedFiles={nbDraggedFiles} />)
+    expect(screen.getByTestId('drag-overlay')).toHaveStyle({ display: 'none' })
+  })
 })

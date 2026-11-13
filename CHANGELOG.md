@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a VS Code colour scheme to tell this project window apart
 - Add a `VERSION` file
 - Drop the redundant `run_install` option from the CI
+- Test the ffmpeg helpers, the slider and the video comparison
 
 ## [0.0.1] - 2026-07-12
 

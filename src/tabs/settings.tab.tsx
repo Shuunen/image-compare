@@ -28,7 +28,7 @@ export function Settings() {
         <Paragraph>You can adjust your preferences here.</Paragraph>
       </motion.div>
       <label className="flex items-center gap-2">
-        <input checked={isDarkTheme} onChange={event => onDarkThemeChange(event.target.checked)} type="checkbox" />
+        <input checked={isDarkTheme} data-testid="dark-theme-toggle" onChange={event => onDarkThemeChange(event.target.checked)} type="checkbox" />
         Dark Theme
       </label>
     </motion.div>

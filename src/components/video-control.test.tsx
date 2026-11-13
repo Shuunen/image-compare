@@ -25,4 +25,14 @@ describe('video-control', () => {
     fireEvent.change(screen.getByTestId('video-seek'), { target: { value: '30' } })
     expect(props.onSeek).toHaveBeenCalledWith(30)
   })
+
+  it('VideoControl E should show the pause button while playing', () => {
+    render(<VideoControl {...props} isPlaying />)
+    expect(screen.getByTestId('video-play-pause')).toHaveTextContent('Pause')
+  })
+
+  it('VideoControl F should show the play button while paused', () => {
+    render(<VideoControl {...props} />)
+    expect(screen.getByTestId('video-play-pause')).toHaveTextContent('Play')
+  })
 })

@@ -23,7 +23,7 @@ export function VideoControl({ canPlay, currentTime, duration, isPlaying, onSeek
           {isPlaying ? 'Pause' : 'Play'}
         </Button>
       )}
-      <Slider className="w-full" max={duration} onValueChange={([time]) => onSeek(time ?? 0)} step={0.01} testId="video-seek" value={value} />
+      <Slider className="w-full" max={duration} onValueChange={([time]) => onSeek(time)} step={0.01} testId="video-seek" value={value} />
       <span className="text-sm whitespace-nowrap text-accent-foreground tabular-nums" data-testid="video-time">
         {formatVideoTime(currentTime)} / {formatVideoTime(duration)}
       </span>

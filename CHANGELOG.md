@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Drop the redundant `run_install` option from the CI
 - Test the ffmpeg helpers, the slider and the video comparison
 - Require 100% test coverage
+- Color the VS Code window from the theme color: title bar, activity bar, status bar, badges and active tab
 
 ## [0.0.1] - 2026-07-12
 

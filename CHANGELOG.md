@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Videos the browser can't play (mkv with unsupported codecs, ...) are compared frame by frame, a frame is extracted with ffmpeg wasm at each seek, no conversion, with a loader over the side being processed
 - Fixed videos with an undecodable video track (e.g. HEVC mkv) showing 0 × 0 and not playing, they now fall back to frame by frame
 - Fixed the layout overflowing the app (cut header and buttons) when the video seek row is shown
+- Add a description and a theme color to the page
+- Redirect every path to the app on Netlify so a reload does not 404
 
 ### Changed
 
